@@ -19,6 +19,6 @@ I am not responsible for any problems you may cause by ignoring this warning, an
 
 ## Usage
 1. Add Unlimited Enchant and restart your server.
-2. The config should now be under the folder for the plugin, make any changes you want.
-3. Restart your server again. The enchantment levels will now be modified.
+2. The config should now be under the folder for the plugin, make any level changes you want.
+3. Restart your server again. When it starts again, the enchantment levels will be what you set in the config.
 4. Have fun with your modified enchantment levels!
