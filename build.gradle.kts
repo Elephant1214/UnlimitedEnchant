@@ -2,7 +2,7 @@ plugins {
     idea
     java
     id("io.papermc.paperweight.userdev")
-    id("xyz.jpenilla.run-paper") version("2.3.0")
+    id("xyz.jpenilla.run-paper")
 }
 
 group = "me.elephant1214.unlimitedenchant"
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 }
 
 val targetJavaVersion = JavaVersion.VERSION_21
@@ -38,7 +38,7 @@ tasks {
     }
     
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.21")
         dependsOn(jar)
     }
 }
