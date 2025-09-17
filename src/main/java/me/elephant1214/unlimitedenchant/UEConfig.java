@@ -1,9 +1,7 @@
 package me.elephant1214.unlimitedenchant;
 
-import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +66,7 @@ public final class UEConfig {
         return blacklist;
     }
 
-    public int getOrSet(@NotNull TypedKey<@NotNull Enchantment> enchantment, int def) {
+    public int getOrSet(@NotNull Key enchantment, int def) {
         final String path = "levels." + enchantment.namespace() + "." + enchantment.value();
 
         Object levelObj = config.get(path);

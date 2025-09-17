@@ -33,7 +33,7 @@ public final class UEBootstrap implements PluginBootstrap {
         }
 
         ctx.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler(event -> {
-            int maxLevel = config.getOrSet(event.key(), event.builder().maxLevel());
+            int maxLevel = config.getOrSet(event.key().key(), event.builder().maxLevel());
 
             if (maxLevel > 0) {
                 event.builder().maxLevel(maxLevel);
