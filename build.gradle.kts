@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "me.elephant1214.unlimitedenchant"
-version = "1.0.0"
+version = "1.1.0"
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 }
 
 val targetJavaVersion = JavaVersion.VERSION_21
@@ -38,7 +38,7 @@ tasks {
     }
     
     runServer {
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.8")
         dependsOn(jar)
     }
 }
