@@ -34,8 +34,12 @@ closed.
    items.
 4. Restart your server.
    When it starts again, the enchantment levels will be what you set in the config,
-   and any disabled enchantments will no longer be obtainable.\
-   Note: Any enchantments in village trades, previously opened but unlooted chests, etc., will still remain.
-   Blacklist the disabled enchantments if you want them to be removed during gameplay.
+   and any disabled enchantments will no longer be obtainable.
 5. Have fun with your modified enchantment levels!
+   \
+   \
+   **Note:**
+   Any enchantments on player items, in villager trades, inside previously opened but unlooted chests, etc., will still
+   remain even after an enchantment is disabled (set to 0). You should Blacklist the disabled enchantments if you want
+   them to be removed during gameplay.
 

@@ -8,7 +8,8 @@ import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.PostFlattenTagRegistrar;
-import me.elephant1214.unlimitedenchant.UEConfig;
+import me.elephant1214.unlimitedenchant.UEConstants;
+import me.elephant1214.unlimitedenchant.config.UEConfig;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,20 +26,29 @@ public final class UEBootstrap implements PluginBootstrap {
 
     @Override
     public void bootstrap(@NotNull BootstrapContext ctx) {
+        if (!initConfig(ctx)) return;
+
+        registerEnchantHandlers(ctx);
+    }
+
+    private boolean initConfig(@NotNull BootstrapContext ctx) {
         try {
             config = new UEConfig(ctx.getDataDirectory());
+            return true;
         } catch (IOException e) {
-            UEConfig.LOGGER.error("Could not create config", e);
-            return;
+            UEConstants.LOGGER.error("Could not create config", e);
+            return false;
         }
+    }
 
+    private void registerEnchantHandlers(@NotNull BootstrapContext ctx) {
         ctx.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler(event -> {
-            int maxLevel = config.getOrSet(event.key().key(), event.builder().maxLevel());
+            int maxLevel = config.getOrSetMaxLevel(event.key().key(), event.builder().maxLevel());
 
             if (maxLevel > 0) {
                 event.builder().maxLevel(maxLevel);
             } else {
-                toDisable.add(event.key());
+                this.toDisable.add(event.key());
             }
         }));
 
@@ -47,7 +57,7 @@ public final class UEBootstrap implements PluginBootstrap {
 
             for (Map.Entry<TagKey<@NotNull Enchantment>, Collection<TypedKey<@NotNull Enchantment>>> entry : registrar.getAllTags().entrySet()) {
                 Set<TypedKey<@NotNull Enchantment>> values = new HashSet<>(entry.getValue());
-                if (values.removeAll(toDisable)) {
+                if (values.removeAll(this.toDisable)) {
                     registrar.setTag(entry.getKey(), values);
                 }
             }
