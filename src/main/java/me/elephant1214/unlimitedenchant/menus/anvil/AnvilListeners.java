@@ -38,6 +38,9 @@ public final class AnvilListeners implements Listener {
         final boolean immovable = stack != null && Util.isImmovable(stack);
         if (immovable) {
             event.setCancelled(true);
+            if (event.getSlot() == AnvilGui.ANVIL_SLOT) {
+                holder.anvilClicked();
+            }
         } else if (event.getSlot() == AnvilGui.RESULT_SLOT && holder.canTakeResult()) {
             holder.onTake();
         }
@@ -54,6 +57,9 @@ public final class AnvilListeners implements Listener {
             ItemStack stack = event.getView().getItem(slot);
             if (stack != null && Util.isImmovable(stack)) {
                 event.setCancelled(true);
+                if (slot == AnvilGui.ANVIL_SLOT) {
+                    holder.anvilClicked();
+                }
                 break;
             }
         }

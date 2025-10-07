@@ -15,6 +15,7 @@ public final class UEConstants {
     public static final class Config {
         public static final String CUSTOM_ANVIL_ENABLED = "customMenus.anvil.enabled";
         public static final String CUSTOM_ANVIL_MAX_LVL = "customMenus.anvil.maxLevel";
+        public static final String CUSTOM_ANVIL_SEPARATOR = "customMenus.anvil.separator";
         public static final String BLACKLIST_ENABLED = "blacklist.enabled";
         public static final String BLACKLIST_ENCHANTS = "blacklist.enchantments";
         public static final String ENCHANTMENT_LEVELS = "levels";

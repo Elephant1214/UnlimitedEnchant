@@ -14,6 +14,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ public final class UEConfig {
 
         config.addDefault(UEConstants.Config.CUSTOM_ANVIL_ENABLED, false);
         config.addDefault(UEConstants.Config.CUSTOM_ANVIL_MAX_LVL, 120);
+        config.addDefault(UEConstants.Config.CUSTOM_ANVIL_SEPARATOR, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjgyYWQxYjljYjRkZDIxMjU5YzBkNzVhYTMxNWZmMzg5YzNjZWY3NTJiZTM5NDkzMzgxNjRiYWM4NGE5NmUifX19");
         config.addDefault(UEConstants.Config.BLACKLIST_ENABLED, false);
         config.addDefault(UEConstants.Config.BLACKLIST_ENCHANTS, List.of("aqua_affinity", "bane_of_arthropods"));
 
@@ -64,6 +66,17 @@ public final class UEConfig {
 
     public void setAnvilMaxLevel(int level) {
         this.manager.get().set(UEConstants.Config.CUSTOM_ANVIL_MAX_LVL, level);
+    }
+
+    public String customAnvilSeparator() {
+        String base64 = this.manager.get().getString(UEConstants.Config.CUSTOM_ANVIL_SEPARATOR);
+        try {
+            Base64.getDecoder().decode(base64);
+        } catch (IllegalArgumentException e) {
+            UEConstants.LOGGER.error("{} had invalid base64; using the default head icon.", UEConstants.Config.CUSTOM_ANVIL_SEPARATOR);
+            base64 = this.manager.get().getDefaults().getString(UEConstants.Config.CUSTOM_ANVIL_SEPARATOR);
+        }
+        return base64;
     }
 
     public boolean blacklistEnabled() {
