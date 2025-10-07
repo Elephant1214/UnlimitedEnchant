@@ -22,7 +22,7 @@ import java.util.Set;
 @SuppressWarnings("UnstableApiUsage")
 public final class UEBootstrap implements PluginBootstrap {
     public static UEConfig config;
-    private final Set<TypedKey<@NotNull Enchantment>> toDisable = new HashSet<>();
+    private Set<TypedKey<@NotNull Enchantment>> toDisable = new HashSet<>();
 
     @Override
     public void bootstrap(@NotNull BootstrapContext ctx) {
@@ -61,6 +61,8 @@ public final class UEBootstrap implements PluginBootstrap {
                     registrar.setTag(entry.getKey(), values);
                 }
             }
+
+            this.toDisable = null; // Set to null after no longer in use so that the memory gets freed
         });
     }
 }
