@@ -1,4 +1,4 @@
-package me.elephant1214.unlimitedenchant.menus.anvil;
+package me.elephant1214.unlimitedenchant.gui.anvil;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;

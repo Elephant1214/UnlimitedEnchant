@@ -8,7 +8,7 @@ import me.elephant1214.unlimitedenchant.blacklist.BlacklistManager;
 import me.elephant1214.unlimitedenchant.bootstrap.UEBootstrap;
 import me.elephant1214.unlimitedenchant.commands.BlacklistCommand;
 import me.elephant1214.unlimitedenchant.commands.LevelSetCommand;
-import me.elephant1214.unlimitedenchant.menus.anvil.AnvilListeners;
+import me.elephant1214.unlimitedenchant.gui.anvil.AnvilListeners;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;

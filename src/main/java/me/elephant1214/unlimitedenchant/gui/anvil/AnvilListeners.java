@@ -1,4 +1,4 @@
-package me.elephant1214.unlimitedenchant.menus.anvil;
+package me.elephant1214.unlimitedenchant.gui.anvil;
 
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
 import me.elephant1214.unlimitedenchant.Util;

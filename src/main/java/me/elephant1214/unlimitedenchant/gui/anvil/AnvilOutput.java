@@ -1,4 +1,4 @@
-package me.elephant1214.unlimitedenchant.menus.anvil;
+package me.elephant1214.unlimitedenchant.gui.anvil;
 
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
