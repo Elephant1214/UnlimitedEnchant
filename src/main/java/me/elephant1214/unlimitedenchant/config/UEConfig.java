@@ -1,7 +1,9 @@
 package me.elephant1214.unlimitedenchant.config;
 
+import com.google.common.collect.Sets;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
 import me.elephant1214.unlimitedenchant.UEConstants;
 import me.elephant1214.unlimitedenchant.Util;
 import net.kyori.adventure.key.Key;
@@ -9,15 +11,12 @@ import org.bukkit.Registry;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Handling for the config because it has to be loaded before the main plugin class exists.
@@ -88,30 +87,31 @@ public final class UEConfig {
     }
 
     @SuppressWarnings("PatternValidation")
-    public Set<Enchantment> blacklistedEnchantments() {
-        final Set<Enchantment> blacklist = new HashSet<>();
+    public Set<TypedKey<@NotNull Enchantment>> blacklistedKeys() {
+        final Set<TypedKey<@NotNull Enchantment>> blacklist = Sets.newHashSet();
         if (!this.blacklistEnabled()) return blacklist;
 
-        final List<String> unparsed = this.manager.get().getStringList(UEConstants.Config.BLACKLIST_ENCHANTS);
-        Registry<@NonNull Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        final List<String> unparsedStrs = this.manager.get().getStringList(UEConstants.Config.BLACKLIST_ENCHANTS);
 
-        for (String enchant : unparsed) {
-            if (!Key.parseable(enchant)) {
-                UEConstants.LOGGER.error("Unable to parse {} as a registry key, skipping it", enchant);
+        for (String unparsed : unparsedStrs) {
+            if (!Key.parseable(unparsed)) {
+                UEConstants.LOGGER.error("Unable to parse {} as a registry key, skipping it", unparsed);
                 continue;
             }
 
-            final Key key = Key.key(enchant);
-            @Nullable Enchantment enchantment = registry.get(key);
-
-            if (enchantment == null) {
-                UEConstants.LOGGER.error("Ignoring blacklisted enchantment {} as it is not present in the game registry", key.asMinimalString());
-            } else {
-                blacklist.add(enchantment);
-            }
+            blacklist.add(TypedKey.create(RegistryKey.ENCHANTMENT, Key.key(unparsed)));
         }
 
         return blacklist;
+    }
+
+    public Set<@NotNull Enchantment> blacklistedEnchantments() {
+        Registry<@NonNull Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        return this.blacklistedKeys()
+                .stream()
+                .map(registry::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     public void blacklistEnchantment(Enchantment enchantment) {

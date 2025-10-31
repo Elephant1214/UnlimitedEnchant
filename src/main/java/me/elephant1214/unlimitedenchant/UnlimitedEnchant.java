@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.List;
 
 public final class UnlimitedEnchant extends JavaPlugin {
-    private final BlacklistManager blacklist = new BlacklistManager(this);
+    private BlacklistManager blacklist;
 
     private static UnlimitedEnchant INSTANCE;
 
@@ -27,6 +27,7 @@ public final class UnlimitedEnchant extends JavaPlugin {
         INSTANCE = this;
         UEBootstrap.config.save();
 
+        this.blacklist = new BlacklistManager(this);
         this.registerEvents();
         this.registerCommands();
     }

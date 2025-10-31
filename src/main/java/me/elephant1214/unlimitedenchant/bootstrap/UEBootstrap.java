@@ -1,5 +1,6 @@
 package me.elephant1214.unlimitedenchant.bootstrap;
 
+import com.google.common.collect.Sets;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -22,7 +23,7 @@ import java.util.Set;
 @SuppressWarnings("UnstableApiUsage")
 public final class UEBootstrap implements PluginBootstrap {
     public static UEConfig config;
-    private Set<TypedKey<@NotNull Enchantment>> toDisable = new HashSet<>();
+    private Set<TypedKey<@NotNull Enchantment>> toDisable = Sets.newHashSet();
 
     @Override
     public void bootstrap(@NotNull BootstrapContext ctx) {
@@ -34,6 +35,7 @@ public final class UEBootstrap implements PluginBootstrap {
     private boolean initConfig(@NotNull BootstrapContext ctx) {
         try {
             config = new UEConfig(ctx.getDataDirectory());
+            this.toDisable.addAll(config.blacklistedKeys());
             return true;
         } catch (IOException e) {
             UEConstants.LOGGER.error("Could not create config", e);
