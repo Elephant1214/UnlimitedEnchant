@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "me.elephant1214.unlimitedenchant"
-version = "1.2.0-SNAPSHOT"
+version = "1.3.0"
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
