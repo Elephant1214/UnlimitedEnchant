@@ -11,9 +11,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.MessageComponentSerializer;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.registry.RegistryKey;
-import me.elephant1214.unlimitedenchant.UEConstants;
+import me.elephant1214.unlimitedenchant.UeConstants;
 import me.elephant1214.unlimitedenchant.blacklist.BlacklistManager;
-import me.elephant1214.unlimitedenchant.bootstrap.UEBootstrap;
+import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.enchantments.Enchantment;
@@ -25,8 +25,9 @@ public final class BlacklistCommand {
         blacklist.then(Commands.literal("add")
                 .then(Commands.argument("enchantment", ArgumentTypes.resource(RegistryKey.ENCHANTMENT))
                         .executes(ctx -> {
-                            if (!manager.isEnabled()) {
-                                final Message message = MessageComponentSerializer.message().serialize(Component.text("The enchantment blacklist is disabled"));
+                            if (!UeBootstrap.config.blacklistEnabled()) {
+                                final Message message = MessageComponentSerializer.message()
+                                        .serialize(Component.text("The enchantment blacklist is disabled"));
                                 throw new SimpleCommandExceptionType(message).create();
                             }
 
@@ -35,18 +36,18 @@ public final class BlacklistCommand {
                             if (manager.contains(enchantment)) {
                                 ctx.getSource().getSender().sendRichMessage(
                                         "<prefix> <enchantment> was already blacklisted.",
-                                        UEConstants.Misc.PLUGIN_PREFIX,
+                                        UeConstants.Misc.PLUGIN_PREFIX,
                                         Placeholder.component("enchantment", enchantment.description())
                                 );
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            UEBootstrap.config.blacklistEnchantment(enchantment);
+                            UeBootstrap.config.blacklistEnchantment(enchantment);
                             manager.updateBlacklist();
 
                             ctx.getSource().getSender().sendRichMessage(
                                     "<prefix> Added <enchantment> to the enchantment blacklist.",
-                                    UEConstants.Misc.PLUGIN_PREFIX,
+                                    UeConstants.Misc.PLUGIN_PREFIX,
                                     Placeholder.component("enchantment", enchantment.description())
                             );
                             return Command.SINGLE_SUCCESS;
@@ -61,19 +62,20 @@ public final class BlacklistCommand {
     private static int toggleBlacklist(BlacklistManager manager, CommandContext<CommandSourceStack> ctx, final boolean enable) throws CommandSyntaxException {
         final String status = enable ? "enabled" : "disabled";
 
-        if (enable == UEBootstrap.config.blacklistEnabled()) {
-            final Message message = MessageComponentSerializer.message().serialize(Component.text("The enchantment blacklist is already " + status));
+        if (enable == UeBootstrap.config.blacklistEnabled()) {
+            final Message message = MessageComponentSerializer.message()
+                    .serialize(Component.text("The enchantment blacklist is already " + status));
             throw new SimpleCommandExceptionType(message).create();
         }
 
-        UEBootstrap.config.setBlacklist(enable);
         if (enable) {
             manager.enableBlacklist();
         } else {
             manager.disableBlacklist();
         }
 
-        ctx.getSource().getSender().sendRichMessage("<prefix> The enchantment blacklist is now " + status, UEConstants.Misc.PLUGIN_PREFIX);
+        ctx.getSource().getSender()
+                .sendRichMessage("<prefix> The enchantment blacklist is now " + status, UeConstants.Misc.PLUGIN_PREFIX);
         return Command.SINGLE_SUCCESS;
     }
 }

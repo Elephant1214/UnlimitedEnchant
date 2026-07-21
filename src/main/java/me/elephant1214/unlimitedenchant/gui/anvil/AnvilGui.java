@@ -2,13 +2,14 @@ package me.elephant1214.unlimitedenchant.gui.anvil;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import me.elephant1214.unlimitedenchant.UEConstants;
+import me.elephant1214.unlimitedenchant.UeConstants;
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
 import me.elephant1214.unlimitedenchant.Util;
-import me.elephant1214.unlimitedenchant.bootstrap.UEBootstrap;
+import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -42,11 +43,12 @@ public final class AnvilGui implements InventoryHolder {
     public static final int RESULT_SLOT = 16;
     public static final int COST_SLOT = 25;
     private static final int INV_SIZE = 9 * 3;
-    private static final Set<Integer> INTERACT_SLOTS = Set.of(10, 12, 16);
+    private static final Set<Integer> INTERACT_SLOTS = ImmutableSet.of(10, 12, 16);
     private static final Map<UUID, AnvilGui> ANVILS = Maps.newHashMap();
     private static final ItemStack FILLER_STACK = makeGuiPart(Material.GRAY_STAINED_GLASS_PANE);
     private static final ItemStack WAITING = makeSeparator();
     private static final ItemStack INVALID = makeGuiPart(Material.BARRIER);
+
     private final @NotNull Player player;
     private final @NotNull AnvilView anvilView;
     private final @NotNull Block anvil;
@@ -61,7 +63,7 @@ public final class AnvilGui implements InventoryHolder {
     }
 
     public static @NotNull AnvilGui makeMenu(@NotNull Player player, @NotNull Block anvil) {
-        return ANVILS.computeIfAbsent(player.getPlayerProfile().getId(), uuid -> new AnvilGui(player, anvil));
+        return ANVILS.computeIfAbsent(player.getPlayerProfile().getId(), _ -> new AnvilGui(player, anvil));
     }
 
     public static @Nullable AnvilGui getMenu(@NotNull Player player) {
@@ -90,7 +92,7 @@ public final class AnvilGui implements InventoryHolder {
         SkullMeta meta = (SkullMeta) head.getItemMeta();
 
         PlayerProfile profile = Bukkit.createProfile(new UUID(0, 0), "");
-        ProfileProperty textures = new ProfileProperty("textures", UEBootstrap.config.customAnvilSeparator());
+        ProfileProperty textures = new ProfileProperty("textures", UeBootstrap.config.customAnvilSeparator());
         profile.setProperty(textures);
 
         meta.setPlayerProfile(profile);
@@ -197,8 +199,8 @@ public final class AnvilGui implements InventoryHolder {
     private @Nullable AnvilOutput getRecipe(ItemStack input1, ItemStack input2) {
         this.anvilView.setMaximumRepairCost(
                 this.bypassLimitPerm()
-                        ? 8192 // What are you doing to make something cost this much and how can you even afford it?
-                        : UEBootstrap.config.customAnvilMaxLevel()
+                        ? 8192 // What are you even doing if you make something cost this much?
+                        : UeBootstrap.config.customAnvilMaxLevel()
         );
 
         ItemStack result = this.updateAnvil(input1, input2);
@@ -219,7 +221,7 @@ public final class AnvilGui implements InventoryHolder {
         stack.setAmount(cost);
 
         ItemMeta meta = stack.getItemMeta();
-        if (cost > UEBootstrap.config.customAnvilMaxLevel() && !this.bypassLimitPerm() && !this.creativeMode()) {
+        if (cost > UeBootstrap.config.customAnvilMaxLevel() && !this.bypassLimitPerm() && !this.creativeMode()) {
             meta.customName(
                     Component.translatable("container.repair.expensive")
                             .style(Style.style(NamedTextColor.RED))
@@ -253,7 +255,7 @@ public final class AnvilGui implements InventoryHolder {
     }
 
     private boolean bypassLimitPerm() {
-        return this.player.hasPermission(UEConstants.Permissions.BYPASS_ANVIL_LIMIT);
+        return this.player.hasPermission(UeConstants.Permissions.BYPASS_ANVIL_LIMIT);
     }
 
     private boolean creativeMode() {

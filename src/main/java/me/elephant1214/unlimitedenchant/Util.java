@@ -17,11 +17,10 @@ public final class Util {
         return ANVIL_TYPES.contains(block.getType());
     }
 
-    public static final NamespacedKey IMMOVABLE_KEY = new NamespacedKey(UnlimitedEnchant.getInstance(), UEConstants.Misc.IMMOVABLE_VALUE);
+    public static final NamespacedKey IMMOVABLE_KEY = new NamespacedKey(UnlimitedEnchant.getInstance(), UeConstants.Misc.IMMOVABLE_VALUE);
 
     public static ItemStack makeImmovable(@NotNull ItemStack stack) {
         stack.editPersistentDataContainer(pdc -> pdc.set(Util.IMMOVABLE_KEY, PersistentDataType.BOOLEAN, true));
-
         return stack;
     }
 

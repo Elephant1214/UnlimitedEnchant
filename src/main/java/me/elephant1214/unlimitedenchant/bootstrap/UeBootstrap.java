@@ -7,23 +7,20 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.event.RegistryEvents;
-import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.PostFlattenTagRegistrar;
-import me.elephant1214.unlimitedenchant.UEConstants;
-import me.elephant1214.unlimitedenchant.config.UEConfig;
+import me.elephant1214.unlimitedenchant.UeConstants;
+import me.elephant1214.unlimitedenchant.config.UeConfig;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("UnstableApiUsage")
-public final class UEBootstrap implements PluginBootstrap {
-    public static UEConfig config;
-    private Set<TypedKey<@NotNull Enchantment>> toDisable = Sets.newHashSet();
+public final class UeBootstrap implements PluginBootstrap {
+    public static UeConfig config;
+    private final Set<TypedKey<@NotNull Enchantment>> toDisable = Sets.newHashSet();
 
     @Override
     public void bootstrap(@NotNull BootstrapContext ctx) {
@@ -32,19 +29,25 @@ public final class UEBootstrap implements PluginBootstrap {
         registerEnchantHandlers(ctx);
     }
 
+    public void onReload() {
+        config.reload();
+        this.toDisable.addAll(config.blacklistedKeys());
+    }
+
     private boolean initConfig(@NotNull BootstrapContext ctx) {
         try {
-            config = new UEConfig(ctx.getDataDirectory());
-            this.toDisable.addAll(config.blacklistedKeys());
+            config = new UeConfig(ctx.getDataDirectory());
             return true;
         } catch (IOException e) {
-            UEConstants.LOGGER.error("Could not create config", e);
+            UeConstants.LOGGER.error("Could not create config", e);
             return false;
         }
     }
 
     private void registerEnchantHandlers(@NotNull BootstrapContext ctx) {
         ctx.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler(event -> {
+            UeConstants.LOGGER.info("Enchantment entry add called");
+            // key().key() for 1.21.4 compatability
             int maxLevel = config.getOrSetMaxLevel(event.key().key(), event.builder().maxLevel());
 
             if (maxLevel > 0) {
@@ -54,17 +57,20 @@ public final class UEBootstrap implements PluginBootstrap {
             }
         }));
 
-        ctx.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT), event -> {
-            final PostFlattenTagRegistrar<@NotNull Enchantment> registrar = event.registrar();
+        ctx.getLifecycleManager()
+                .registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT), event -> {
+                    UeConstants.LOGGER.info("postFlatten called");
+                    final PostFlattenTagRegistrar<@NotNull Enchantment> registrar = event.registrar();
 
-            for (Map.Entry<TagKey<@NotNull Enchantment>, Collection<TypedKey<@NotNull Enchantment>>> entry : registrar.getAllTags().entrySet()) {
-                Set<TypedKey<@NotNull Enchantment>> values = new HashSet<>(entry.getValue());
-                if (values.removeAll(this.toDisable)) {
-                    registrar.setTag(entry.getKey(), values);
-                }
-            }
+                    for (var entry : registrar.getAllTags().entrySet()) {
+                        Set<TypedKey<@NotNull Enchantment>> values = new HashSet<>(entry.getValue());
+                        if (values.removeAll(this.toDisable)) {
+                            registrar.setTag(entry.getKey(), values);
+                        }
+                    }
 
-            this.toDisable = null; // Set to null after no longer in use so that the memory gets freed
-        });
+                    this.toDisable.clear();
+                    UeConstants.LOGGER.info("toDisable reset");
+                });
     }
 }

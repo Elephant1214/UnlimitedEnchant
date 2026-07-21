@@ -6,25 +6,23 @@ plugins {
 }
 
 group = "me.elephant1214.unlimitedenchant"
-version = "1.3.0"
+version = "1.4.0"
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://oss.sonatype.org/content/groups/public/")
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("26.1.2.build.74-stable")
 }
 
-val targetJavaVersion = JavaVersion.VERSION_21
+val targetJavaVersion = JavaVersion.VERSION_25
 java {
     targetCompatibility = targetJavaVersion
     sourceCompatibility = targetJavaVersion
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 tasks {
@@ -38,7 +36,7 @@ tasks {
     }
     
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("26.2")
         dependsOn(jar)
     }
 }
