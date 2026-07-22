@@ -4,7 +4,6 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.elephant1214.unlimitedenchant.UeConstants;
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
@@ -30,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,7 +42,6 @@ public final class AnvilGui implements InventoryHolder {
     public static final int COST_SLOT = 25;
     private static final int INV_SIZE = 9 * 3;
     private static final Set<Integer> INTERACT_SLOTS = ImmutableSet.of(10, 12, 16);
-    private static final Map<UUID, AnvilGui> ANVILS = Maps.newHashMap();
     private static final ItemStack FILLER_STACK = makeGuiPart(Material.GRAY_STAINED_GLASS_PANE);
     private static final ItemStack WAITING = makeSeparator();
     private static final ItemStack INVALID = makeGuiPart(Material.BARRIER);
@@ -60,14 +57,6 @@ public final class AnvilGui implements InventoryHolder {
         this.anvilView = buildAnvilView(player, anvil);
         this.anvil = anvil;
         this.inv = Bukkit.createInventory(player, INV_SIZE, Component.translatable("container.repair"));
-    }
-
-    public static @NotNull AnvilGui makeMenu(@NotNull Player player, @NotNull Block anvil) {
-        return ANVILS.computeIfAbsent(player.getPlayerProfile().getId(), _ -> new AnvilGui(player, anvil));
-    }
-
-    public static @Nullable AnvilGui getMenu(@NotNull Player player) {
-        return ANVILS.get(player.getPlayerProfile().getId());
     }
 
     private static AnvilView buildAnvilView(@NotNull Player player, @NotNull Block anvil) {
@@ -164,7 +153,8 @@ public final class AnvilGui implements InventoryHolder {
         this.inv.setItem(INPUT2_SLOT, null);
 
         AnvilMenu menu = (AnvilMenu) ((CraftAnvilView) this.anvilView).getHandle();
-        menu.slots.get(menu.getResultSlot()).onTake(((CraftPlayer) this.player).getHandle(), menu.getItems().get(menu.getResultSlot()));
+        menu.slots.get(menu.getResultSlot())
+                .onTake(((CraftPlayer) this.player).getHandle(), menu.getItems().get(menu.getResultSlot()));
     }
 
     private void returnItems() {
@@ -181,8 +171,7 @@ public final class AnvilGui implements InventoryHolder {
     }
 
     public void onClose() {
-        ANVILS.remove(this.player.getPlayerProfile().getId());
-
+        AnvilManager.removeAnvil(this.player);
         Bukkit.getScheduler().runTaskLater(UnlimitedEnchant.getInstance(), AnvilGui.this::returnItems, 1L);
     }
 

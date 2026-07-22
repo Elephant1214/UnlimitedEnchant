@@ -19,11 +19,10 @@ public final class AnvilListeners implements Listener {
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("DataFlowIssue") // getClickedBlock cannot be null if hasBlock is true
     @EventHandler
     public void onOpenAnvil(PlayerInteractEvent event) {
-        if (event.hasBlock() && Util.isAnvil(event.getClickedBlock())) {
-            AnvilGui menu = AnvilGui.makeMenu(event.getPlayer(), event.getClickedBlock());
+        if (event.getClickedBlock() != null && Util.isAnvil(event.getClickedBlock())) {
+            AnvilGui menu = AnvilManager.makeAnvil(event.getPlayer(), event.getClickedBlock());
             menu.openInventory();
             event.setCancelled(true);
         }
@@ -31,7 +30,7 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onClickInv(InventoryClickEvent event) {
-        AnvilGui holder = AnvilGui.getMenu((Player) event.getView().getPlayer());
+        AnvilGui holder = AnvilManager.getAnvil((Player) event.getView().getPlayer());
         if (holder == null || event.getInventory() != holder.getInventory()) return;
 
         final ItemStack stack = event.getCurrentItem();
@@ -50,7 +49,7 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onInvDrag(InventoryDragEvent event) {
-        AnvilGui holder = AnvilGui.getMenu((Player) event.getView().getPlayer());
+        AnvilGui holder = AnvilManager.getAnvil((Player) event.getView().getPlayer());
         if (holder == null || event.getView().getTopInventory() != holder.getInventory()) return;
 
         for (int slot : event.getRawSlots()) {
@@ -73,7 +72,7 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onInvClose(InventoryCloseEvent event) {
-        AnvilGui holder = AnvilGui.getMenu((Player) event.getView().getPlayer());
+        AnvilGui holder = AnvilManager.getAnvil((Player) event.getView().getPlayer());
         if (holder == null || holder.getInventory() != event.getInventory()) return;
 
         holder.onClose();
