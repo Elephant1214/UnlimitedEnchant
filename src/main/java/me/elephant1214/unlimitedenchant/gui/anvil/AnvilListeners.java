@@ -1,7 +1,7 @@
 package me.elephant1214.unlimitedenchant.gui.anvil;
 
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
-import me.elephant1214.unlimitedenchant.Util;
+import me.elephant1214.unlimitedenchant.util.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +21,7 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onOpenAnvil(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && Util.isAnvil(event.getClickedBlock())) {
+        if (event.getClickedBlock() != null && ItemUtils.isAnvil(event.getClickedBlock())) {
             AnvilGui menu = AnvilManager.makeAnvil(event.getPlayer(), event.getClickedBlock());
             menu.openInventory();
             event.setCancelled(true);
@@ -34,7 +34,7 @@ public final class AnvilListeners implements Listener {
         if (holder == null || event.getInventory() != holder.getInventory()) return;
 
         final ItemStack stack = event.getCurrentItem();
-        final boolean immovable = stack != null && Util.isImmovable(stack);
+        final boolean immovable = stack != null && ItemUtils.isImmovable(stack);
         if (immovable) {
             event.setCancelled(true);
             if (event.getSlot() == AnvilGui.ANVIL_SLOT) {
@@ -54,7 +54,7 @@ public final class AnvilListeners implements Listener {
 
         for (int slot : event.getRawSlots()) {
             ItemStack stack = event.getView().getItem(slot);
-            if (stack != null && Util.isImmovable(stack)) {
+            if (stack != null && ItemUtils.isImmovable(stack)) {
                 event.setCancelled(true);
                 if (slot == AnvilGui.ANVIL_SLOT) {
                     holder.anvilClicked();

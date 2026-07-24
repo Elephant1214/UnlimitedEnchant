@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.elephant1214.unlimitedenchant.UeConstants;
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
-import me.elephant1214.unlimitedenchant.Util;
 import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
+import me.elephant1214.unlimitedenchant.util.ItemUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -42,9 +42,9 @@ public final class AnvilGui implements InventoryHolder {
     public static final int COST_SLOT = 25;
     private static final int INV_SIZE = 9 * 3;
     private static final Set<Integer> INTERACT_SLOTS = ImmutableSet.of(10, 12, 16);
-    private static final ItemStack FILLER_STACK = makeGuiPart(Material.GRAY_STAINED_GLASS_PANE);
+    private static final ItemStack FILLER_STACK = makeFillerStack(Material.GRAY_STAINED_GLASS_PANE);
     private static final ItemStack WAITING = makeSeparator();
-    private static final ItemStack INVALID = makeGuiPart(Material.BARRIER);
+    private static final ItemStack INVALID = makeFillerStack(Material.BARRIER);
 
     private final @NotNull Player player;
     private final @NotNull AnvilView anvilView;
@@ -65,14 +65,14 @@ public final class AnvilGui implements InventoryHolder {
                 .build(player);
     }
 
-    private static ItemStack makeGuiPart(@NotNull Material material) {
+    private static ItemStack makeFillerStack(@NotNull Material material) {
         ItemStack renameStack = new ItemStack(material, 1);
 
         ItemMeta meta = renameStack.getItemMeta();
         meta.customName(Component.text(""));
         renameStack.setItemMeta(meta);
 
-        Util.makeImmovable(renameStack);
+        ItemUtils.makeImmovable(renameStack);
         return renameStack;
     }
 
@@ -88,7 +88,7 @@ public final class AnvilGui implements InventoryHolder {
         meta.displayName(Component.text(""));
         head.setItemMeta(meta);
 
-        Util.makeImmovable(head);
+        ItemUtils.makeImmovable(head);
         return head;
     }
 
@@ -139,7 +139,7 @@ public final class AnvilGui implements InventoryHolder {
 
         this.setSlots(
                 this.canTake ? WAITING : INVALID,
-                this.canTake ? result.stack() : Util.makeImmovable(result.stack()),
+                this.canTake ? result.stack() : ItemUtils.makeImmovable(result.stack()),
                 makeCostStack(result.cost())
         );
     }
@@ -223,7 +223,7 @@ public final class AnvilGui implements InventoryHolder {
         }
         stack.setItemMeta(meta);
 
-        Util.makeImmovable(stack);
+        ItemUtils.makeImmovable(stack);
         return stack;
     }
 
@@ -232,7 +232,7 @@ public final class AnvilGui implements InventoryHolder {
     }
 
     private void addAnvilButton() {
-        this.inv.setItem(ANVIL_SLOT, Util.makeImmovable(ItemStack.of(Material.ANVIL)));
+        this.inv.setItem(ANVIL_SLOT, ItemUtils.makeImmovable(ItemStack.of(Material.ANVIL)));
     }
 
     private void addFiller() {

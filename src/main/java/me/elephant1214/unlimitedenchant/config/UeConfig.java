@@ -5,7 +5,7 @@ import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import me.elephant1214.unlimitedenchant.UeConstants;
-import me.elephant1214.unlimitedenchant.Util;
+import me.elephant1214.unlimitedenchant.util.Helpers;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Registry;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -123,7 +123,7 @@ public final class UeConfig {
         YamlConfiguration config = this.manager.get();
 
         List<String> blacklist = config.getStringList(UeConstants.Config.BLACKLIST_ENCHANTS);
-        blacklist.add(Util.asKey(enchantment));
+        blacklist.add(Helpers.asKey(enchantment));
 
         config.set(UeConstants.Config.BLACKLIST_ENCHANTS, blacklist);
         this.save();

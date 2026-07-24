@@ -25,10 +25,10 @@ public final class UeConstants {
 
         try {
             final int major = Integer.parseInt(version);
-            // Technically not possible anyway since prior versions use a dot at index 1, but
+            // Technically not possible anyway since prior versions use a dot at index 1
             return major < 26;
         } catch (NumberFormatException e) {
-            UeConstants.LOGGER.info("Unable to parse version number");
+            UeConstants.LOGGER.info("Unable to parse version number"); // do not forget to remove this lmao
             return true;
         }
     }
