@@ -25,15 +25,15 @@ import java.util.stream.Collectors;
  * Handling for the config because it has to be loaded before the main plugin class exists.
  */
 public final class UeConfig {
-    private final ConfigurationManager manager;
+    private final ConfigurationManager cfgManager;
 
     public UeConfig(@NotNull Path folder) throws IOException {
-        this.manager = new ConfigurationManager(folder, "config.yml");
+        this.cfgManager = new ConfigurationManager(folder, "config.yml");
         this.setDefaults();
     }
 
     private void setDefaults() {
-        YamlConfiguration config = this.manager.get();
+        YamlConfiguration config = this.cfgManager.get();
 
         config.addDefault(UeConstants.Config.CONFIG_VERSION, 1);
         config.addDefault(UeConstants.Config.CUSTOM_ANVIL_ENABLED, false);
@@ -51,34 +51,34 @@ public final class UeConfig {
                 "The effects of Channeling, Curse of Binding, Curse of Vanishing, Flame, Infinity, Mending, and Silk Touch do not change with increased levels.")
         );
 
-        this.manager.save();
+        this.cfgManager.save();
     }
 
     public boolean customAnvilEnabled() {
-        return this.manager.get().getBoolean(UeConstants.Config.CUSTOM_ANVIL_ENABLED);
+        return this.cfgManager.get().getBoolean(UeConstants.Config.CUSTOM_ANVIL_ENABLED);
     }
 
     public void setCustomAnvil(boolean enabled) {
-        this.manager.get().set(UeConstants.Config.CUSTOM_ANVIL_ENABLED, enabled);
+        this.cfgManager.get().set(UeConstants.Config.CUSTOM_ANVIL_ENABLED, enabled);
     }
 
     public int customAnvilMaxLevel() {
-        return this.manager.get().getInt(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL);
+        return this.cfgManager.get().getInt(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL);
     }
 
     public void setAnvilMaxLevel(int level) {
-        this.manager.get().set(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL, level);
+        this.cfgManager.get().set(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL, level);
     }
 
     @SuppressWarnings("DataFlowIssue")
     public String customAnvilSeparator() {
-        String base64 = this.manager.get().getString(UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
+        String base64 = this.cfgManager.get().getString(UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
 
         try {
             Base64.getDecoder().decode(base64);
         } catch (IllegalArgumentException e) {
             UeConstants.LOGGER.error("{} had invalid base64; using the default head icon.", UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
-            base64 = this.manager
+            base64 = this.cfgManager
                     .get()
                     .getDefaults()
                     .getString(UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
@@ -88,11 +88,11 @@ public final class UeConfig {
     }
 
     public boolean blacklistEnabled() {
-        return this.manager.get().getBoolean(UeConstants.Config.BLACKLIST_ENABLED);
+        return this.cfgManager.get().getBoolean(UeConstants.Config.BLACKLIST_ENABLED);
     }
 
     public void setBlacklist(boolean enabled) {
-        this.manager.get().set(UeConstants.Config.BLACKLIST_ENABLED, enabled);
+        this.cfgManager.get().set(UeConstants.Config.BLACKLIST_ENABLED, enabled);
     }
 
     @SuppressWarnings("PatternValidation")
@@ -100,7 +100,7 @@ public final class UeConfig {
         final Set<TypedKey<@NotNull Enchantment>> blacklist = Sets.newHashSet();
         if (!this.blacklistEnabled()) return blacklist;
 
-        final List<String> unparsedStrs = this.manager.get().getStringList(UeConstants.Config.BLACKLIST_ENCHANTS);
+        final List<String> unparsedStrs = this.cfgManager.get().getStringList(UeConstants.Config.BLACKLIST_ENCHANTS);
 
         for (String unparsed : unparsedStrs) {
             if (!Key.parseable(unparsed)) {
@@ -120,7 +120,7 @@ public final class UeConfig {
     }
 
     public void blacklistEnchantment(Enchantment enchantment) {
-        YamlConfiguration config = this.manager.get();
+        YamlConfiguration config = this.cfgManager.get();
 
         List<String> blacklist = config.getStringList(UeConstants.Config.BLACKLIST_ENCHANTS);
         blacklist.add(Helpers.asKey(enchantment));
@@ -130,7 +130,7 @@ public final class UeConfig {
     }
 
     public int getOrSetMaxLevel(@NotNull Key enchantment, int def) {
-        YamlConfiguration config = this.manager.get();
+        YamlConfiguration config = this.cfgManager.get();
         final String path = UeConstants.Config.ENCHANTMENT_LEVELS + "." + enchantment.namespace() + "." + enchantment.value();
 
         Object levelObj = config.get(path);
@@ -146,15 +146,15 @@ public final class UeConfig {
 
     public void setMaxLevel(@NotNull Key enchantment, int value) {
         final String path = UeConstants.Config.ENCHANTMENT_LEVELS + "." + enchantment.namespace() + "." + enchantment.value();
-        this.manager.get().set(path, value);
+        this.cfgManager.get().set(path, value);
         this.save();
     }
 
     public void reload() {
-        this.manager.reload();
+        this.cfgManager.reload();
     }
 
     public void save() {
-        this.manager.save();
+        this.cfgManager.save();
     }
 }
