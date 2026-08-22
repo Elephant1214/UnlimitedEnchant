@@ -29,11 +29,6 @@ public final class UeBootstrap implements PluginBootstrap {
         registerEnchantHandlers(ctx);
     }
 
-    public void onReload() {
-        config.reload();
-        this.toDisable.addAll(config.blacklistedKeys());
-    }
-
     private boolean initConfig(@NotNull BootstrapContext ctx) {
         try {
             config = new UeConfig(ctx.getDataDirectory());
@@ -48,7 +43,7 @@ public final class UeBootstrap implements PluginBootstrap {
         ctx.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler(event -> {
             UeConstants.LOGGER.info("Enchantment entry add called");
             // key().key() for 1.21.4 compatability
-            int maxLevel = config.getOrSetMaxLevel(event.key().key(), event.builder().maxLevel());
+            int maxLevel = config.getOrComputeMaxLevel(event.key().key(), event.builder().maxLevel());
 
             if (maxLevel > 0) {
                 event.builder().maxLevel(maxLevel);

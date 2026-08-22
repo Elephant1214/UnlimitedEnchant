@@ -39,7 +39,7 @@ public final class UnlimitedEnchant extends JavaPlugin {
 
     private void registerEvents() {
         // this.getServer().getPluginManager().registerEvents(new EnchantmentMenu(), this);
-        if (UeBootstrap.config.customAnvilEnabled()) {
+        if (UeBootstrap.config.isAnvilEnabled()) {
             this.getServer().getPluginManager().registerEvents(new AnvilListeners(this), this);
         }
     }

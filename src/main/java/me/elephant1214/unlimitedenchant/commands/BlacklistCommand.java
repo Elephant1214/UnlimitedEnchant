@@ -25,7 +25,7 @@ public final class BlacklistCommand {
         blacklist.then(Commands.literal("add")
                 .then(Commands.argument("enchantment", ArgumentTypes.resource(RegistryKey.ENCHANTMENT))
                         .executes(ctx -> {
-                            if (!UeBootstrap.config.blacklistEnabled()) {
+                            if (!UeBootstrap.config.isBlacklistEnabled()) {
                                 final Message message = MessageComponentSerializer.message()
                                         .serialize(Component.text("The enchantment blacklist is disabled"));
                                 throw new SimpleCommandExceptionType(message).create();
@@ -35,18 +35,18 @@ public final class BlacklistCommand {
 
                             if (manager.contains(enchantment)) {
                                 ctx.getSource().getSender().sendRichMessage(
-                                        "<prefix> <enchantment> was already blacklisted.",
+                                        "<prefix> <#CCCCCC><enchantment> was already blacklisted.",
                                         UeConstants.Misc.PLUGIN_PREFIX,
                                         Placeholder.component("enchantment", enchantment.description())
                                 );
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            UeBootstrap.config.blacklistEnchantment(enchantment);
+                            UeBootstrap.config.addBlacklistedEnchantment(enchantment);
                             manager.updateBlacklist();
 
                             ctx.getSource().getSender().sendRichMessage(
-                                    "<prefix> Added <enchantment> to the enchantment blacklist.",
+                                    "<prefix> <#CCCCCC>Added <enchantment> to the enchantment blacklist.",
                                     UeConstants.Misc.PLUGIN_PREFIX,
                                     Placeholder.component("enchantment", enchantment.description())
                             );
@@ -62,7 +62,7 @@ public final class BlacklistCommand {
     private static int toggleBlacklist(BlacklistManager manager, CommandContext<CommandSourceStack> ctx, final boolean enable) throws CommandSyntaxException {
         final String status = enable ? "enabled" : "disabled";
 
-        if (enable == UeBootstrap.config.blacklistEnabled()) {
+        if (enable == UeBootstrap.config.isBlacklistEnabled()) {
             final Message message = MessageComponentSerializer.message()
                     .serialize(Component.text("The enchantment blacklist is already " + status));
             throw new SimpleCommandExceptionType(message).create();
@@ -75,7 +75,7 @@ public final class BlacklistCommand {
         }
 
         ctx.getSource().getSender()
-                .sendRichMessage("<prefix> The enchantment blacklist is now " + status, UeConstants.Misc.PLUGIN_PREFIX);
+                .sendRichMessage("<prefix> <#CCCCCC>The enchantment blacklist is now " + status, UeConstants.Misc.PLUGIN_PREFIX);
         return Command.SINGLE_SUCCESS;
     }
 }

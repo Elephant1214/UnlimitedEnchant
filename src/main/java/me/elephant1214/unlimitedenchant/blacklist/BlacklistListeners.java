@@ -128,7 +128,7 @@ public final class BlacklistListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemClicked(@NotNull InventoryClickEvent event) {
-        if (!UeBootstrap.config.blacklistEnabled()) return;
+        if (!UeBootstrap.config.isBlacklistEnabled()) return;
 
         ItemStack currentItem = event.getCurrentItem();
         Inventory clicked = event.getClickedInventory();
@@ -154,7 +154,7 @@ public final class BlacklistListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemPickup(@NotNull EntityPickupItemEvent event) {
-        if (!UeBootstrap.config.blacklistEnabled()) return;
+        if (!UeBootstrap.config.isBlacklistEnabled()) return;
 
         ItemStack pickedUp = event.getItem().getItemStack();
         if (pickedUp.getType() == Material.ENCHANTED_BOOK) {
@@ -187,7 +187,7 @@ public final class BlacklistListeners implements Listener {
     }
 
     private void handleSimilar(@NotNull Cancellable event, @NotNull Player player) {
-        if (!UeBootstrap.config.blacklistEnabled()) return;
+        if (!UeBootstrap.config.isBlacklistEnabled()) return;
 
         PlayerInventory inventory = player.getInventory();
         ItemStack main = inventory.getItemInMainHand();

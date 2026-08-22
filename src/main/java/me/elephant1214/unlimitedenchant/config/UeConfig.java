@@ -36,11 +36,11 @@ public final class UeConfig {
         YamlConfiguration config = this.cfgManager.get();
 
         config.addDefault(UeConstants.Config.CONFIG_VERSION, 1);
-        config.addDefault(UeConstants.Config.CUSTOM_ANVIL_ENABLED, false);
-        config.addDefault(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL, 120);
-        config.addDefault(UeConstants.Config.CUSTOM_ANVIL_SEPARATOR, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjgyYWQxYjljYjRkZDIxMjU5YzBkNzVhYTMxNWZmMzg5YzNjZWY3NTJiZTM5NDkzMzgxNjRiYWM4NGE5NmUifX19");
+        config.addDefault(UeConstants.Config.ANVIL_ENABLED, false);
+        config.addDefault(UeConstants.Config.ANVIL_MAX_LVL, 120);
+        config.addDefault(UeConstants.Config.ANVIL_SEPARATOR, UeConstants.Gui.DEFAULT_SEPERATOR);
         config.addDefault(UeConstants.Config.BLACKLIST_ENABLED, false);
-        config.addDefault(UeConstants.Config.BLACKLIST_ENCHANTS, List.of("aqua_affinity", "bane_of_arthropods"));
+        config.addDefault(UeConstants.Config.BLACKLISTED_ENCHANTS, List.of("aqua_affinity", "bane_of_arthropods"));
 
         config.options().copyDefaults(true);
         config.options().setHeader(List.of(
@@ -54,53 +54,56 @@ public final class UeConfig {
         this.cfgManager.save();
     }
 
-    public boolean customAnvilEnabled() {
-        return this.cfgManager.get().getBoolean(UeConstants.Config.CUSTOM_ANVIL_ENABLED);
+    public boolean isAnvilEnabled() {
+        return this.cfgManager.get().getBoolean(UeConstants.Config.ANVIL_ENABLED);
     }
 
-    public void setCustomAnvil(boolean enabled) {
-        this.cfgManager.get().set(UeConstants.Config.CUSTOM_ANVIL_ENABLED, enabled);
+    public void setAnvilEnabled(boolean enabled) {
+        this.cfgManager.get().set(UeConstants.Config.ANVIL_ENABLED, enabled);
     }
 
-    public int customAnvilMaxLevel() {
-        return this.cfgManager.get().getInt(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL);
+    public int getAnvilMaxLevel() {
+        return this.cfgManager.get().getInt(UeConstants.Config.ANVIL_MAX_LVL);
     }
 
     public void setAnvilMaxLevel(int level) {
-        this.cfgManager.get().set(UeConstants.Config.CUSTOM_ANVIL_MAX_LVL, level);
+        this.cfgManager.get().set(UeConstants.Config.ANVIL_MAX_LVL, level);
     }
 
-    @SuppressWarnings("DataFlowIssue")
-    public String customAnvilSeparator() {
-        String base64 = this.cfgManager.get().getString(UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
+    /**
+     * Loads and parses the base64 head texture for the input/output seperator in the anvil. If the configured base64
+     * is invalid, an error will be logged and the plugin will use the default.
+     *
+     * @return the texture string for the input/output seperator slot or the default
+     */
+    public @NotNull String getAnvilHeadTexture() {
+        @NotNull String base64 = this.cfgManager.get()
+                .getString(UeConstants.Config.ANVIL_SEPARATOR, UeConstants.Gui.DEFAULT_SEPERATOR);
 
         try {
             Base64.getDecoder().decode(base64);
         } catch (IllegalArgumentException e) {
-            UeConstants.LOGGER.error("{} had invalid base64; using the default head icon.", UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
-            base64 = this.cfgManager
-                    .get()
-                    .getDefaults()
-                    .getString(UeConstants.Config.CUSTOM_ANVIL_SEPARATOR);
+            UeConstants.LOGGER.error("{} had invalid base64; using the default head icon.", UeConstants.Config.ANVIL_SEPARATOR);
+            base64 = UeConstants.Gui.DEFAULT_SEPERATOR;
         }
 
         return base64;
     }
 
-    public boolean blacklistEnabled() {
+    public boolean isBlacklistEnabled() {
         return this.cfgManager.get().getBoolean(UeConstants.Config.BLACKLIST_ENABLED);
     }
 
-    public void setBlacklist(boolean enabled) {
+    public void setBlacklistEnabled(boolean enabled) {
         this.cfgManager.get().set(UeConstants.Config.BLACKLIST_ENABLED, enabled);
     }
 
     @SuppressWarnings("PatternValidation")
-    public Set<TypedKey<@NotNull Enchantment>> blacklistedKeys() {
+    public Set<TypedKey<@NotNull Enchantment>> getBlacklistedKeys() {
         final Set<TypedKey<@NotNull Enchantment>> blacklist = Sets.newHashSet();
-        if (!this.blacklistEnabled()) return blacklist;
+        if (!this.isBlacklistEnabled()) return blacklist;
 
-        final List<String> unparsedStrs = this.cfgManager.get().getStringList(UeConstants.Config.BLACKLIST_ENCHANTS);
+        final List<String> unparsedStrs = this.cfgManager.get().getStringList(UeConstants.Config.BLACKLISTED_ENCHANTS);
 
         for (String unparsed : unparsedStrs) {
             if (!Key.parseable(unparsed)) {
@@ -114,40 +117,41 @@ public final class UeConfig {
         return blacklist;
     }
 
-    public Set<@NotNull Enchantment> blacklistedEnchantments() {
+    public Set<@NotNull Enchantment> getBlacklistedEnchantments() {
         Registry<@NonNull Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
-        return this.blacklistedKeys().stream().map(registry::get).filter(Objects::nonNull).collect(Collectors.toSet());
+        return this.getBlacklistedKeys().stream().map(registry::get).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
-    public void blacklistEnchantment(Enchantment enchantment) {
+    public void addBlacklistedEnchantment(Enchantment enchantment) {
         YamlConfiguration config = this.cfgManager.get();
 
-        List<String> blacklist = config.getStringList(UeConstants.Config.BLACKLIST_ENCHANTS);
+        List<String> blacklist = config.getStringList(UeConstants.Config.BLACKLISTED_ENCHANTS);
         blacklist.add(Helpers.asKey(enchantment));
 
-        config.set(UeConstants.Config.BLACKLIST_ENCHANTS, blacklist);
+        config.set(UeConstants.Config.BLACKLISTED_ENCHANTS, blacklist);
         this.save();
     }
 
-    public int getOrSetMaxLevel(@NotNull Key enchantment, int def) {
+    public int getMaxLevel(@NotNull Enchantment enchantment) {
+        return getOrComputeMaxLevel(enchantment.key().key(), enchantment.getMaxLevel());
+    }
+
+    public void setMaxLevel(@NotNull Key enchantment, int value) {
+        final String path = UeConstants.Config.ENCHANT_LEVEL_RANGES + "." + enchantment.namespace() + "." + enchantment.value();
+        this.cfgManager.get().set(path, value);
+        this.save();
+    }
+
+    public int getOrComputeMaxLevel(@NotNull Key enchantment, int def) {
         YamlConfiguration config = this.cfgManager.get();
-        final String path = UeConstants.Config.ENCHANTMENT_LEVELS + "." + enchantment.namespace() + "." + enchantment.value();
+        final String path = UeConstants.Config.ENCHANT_LEVEL_RANGES + "." + enchantment.namespace() + "." + enchantment.value();
 
         Object levelObj = config.get(path);
         if (levelObj instanceof Integer level && level >= 0) return level;
 
         config.set(path, def);
         return def;
-    }
-
-    public int getMaxLevel(@NotNull Enchantment enchantment) {
-        return getOrSetMaxLevel(enchantment.key().key(), enchantment.getMaxLevel());
-    }
-
-    public void setMaxLevel(@NotNull Key enchantment, int value) {
-        final String path = UeConstants.Config.ENCHANTMENT_LEVELS + "." + enchantment.namespace() + "." + enchantment.value();
-        this.cfgManager.get().set(path, value);
-        this.save();
     }
 
     public void reload() {

@@ -17,13 +17,13 @@ public final class BlacklistManager {
     public BlacklistManager(UnlimitedEnchant plugin) {
         this.plugin = plugin;
 
-        if (UeBootstrap.config.blacklistEnabled()) {
+        if (UeBootstrap.config.isBlacklistEnabled()) {
             this.enableBlacklist();
         }
     }
 
     public void updateBlacklist() {
-        this.blacklistedEnchants = UeBootstrap.config.blacklistedEnchantments();
+        this.blacklistedEnchants = UeBootstrap.config.getBlacklistedEnchantments();
     }
 
     public boolean contains(@NotNull Enchantment enchantment) {
@@ -38,13 +38,13 @@ public final class BlacklistManager {
             this.plugin.getServer().getPluginManager().registerEvents(new BlacklistListeners(this), this.plugin);
             this.listenersRegistered = true;
         }
-        UeBootstrap.config.setBlacklist(true);
+        UeBootstrap.config.setBlacklistEnabled(true);
     }
 
     public void disableBlacklist() {
         UeConstants.LOGGER.info("Enchantment blacklist is now disabled");
 
-        UeBootstrap.config.setBlacklist(false);
+        UeBootstrap.config.setBlacklistEnabled(false);
         this.blacklistedEnchants = null;
     }
 }

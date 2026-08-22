@@ -23,7 +23,7 @@ public final class LevelSetCommand {
                     final int curLevel = UeBootstrap.config.getMaxLevel(enchantment);
                     if (curLevel == level) {
                         ctx.getSource().getSender().sendRichMessage(
-                                "<prefix> The maximum level for <enchantment> was already set to <level>!",
+                                "<prefix> <#CCCCCC>The maximum level for <enchantment> was already set to <level>!",
                                 UeConstants.Misc.PLUGIN_PREFIX,
                                 Placeholder.component("enchantment", enchantment.description()),
                                 Placeholder.component("level", Component.text(level))
@@ -33,7 +33,7 @@ public final class LevelSetCommand {
 
                     UeBootstrap.config.setMaxLevel(enchantment.key().key(), level);
                     ctx.getSource().getSender().sendRichMessage(
-                            "<prefix> Set the maximum level for <enchantment> to <level>.\n<u>You must restart your server for this change to take effect.</u>",
+                            "<prefix> <#CCCCCC>Set the maximum level for <enchantment> to <level>.\n<u>You must restart your server for this change to take effect.</u>",
                             UeConstants.Misc.PLUGIN_PREFIX,
                             Placeholder.component("enchantment", enchantment.description()),
                             Placeholder.component("level", Component.text(level))

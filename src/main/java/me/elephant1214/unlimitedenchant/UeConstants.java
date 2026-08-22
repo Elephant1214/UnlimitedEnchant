@@ -36,12 +36,16 @@ public final class UeConstants {
     public static final class Config {
         public static final String CONFIG_VERSION = "version";
 
-        public static final String CUSTOM_ANVIL_ENABLED = "customMenus.anvil.enabled";
-        public static final String CUSTOM_ANVIL_MAX_LVL = "customMenus.anvil.maxLevel";
-        public static final String CUSTOM_ANVIL_SEPARATOR = "customMenus.anvil.separator";
+        public static final String ANVIL_ENABLED = "customMenus.anvil.enabled";
+        public static final String ANVIL_MAX_LVL = "customMenus.anvil.maxLevel";
+        public static final String ANVIL_SEPARATOR = "customMenus.anvil.separator";
         public static final String BLACKLIST_ENABLED = "blacklist.enabled";
-        public static final String BLACKLIST_ENCHANTS = "blacklist.enchantments";
-        public static final String ENCHANTMENT_LEVELS = "levels";
+        public static final String BLACKLISTED_ENCHANTS = "blacklist.enchantments";
+        public static final String ENCHANT_LEVEL_RANGES = "levels";
+    }
+
+    public static final class Gui {
+        public static final String DEFAULT_SEPERATOR = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjgyYWQxYjljYjRkZDIxMjU5YzBkNzVhYTMxNWZmMzg5YzNjZWY3NTJiZTM5NDkzMzgxNjRiYWM4NGE5NmUifX19";
     }
 
     public static final class Permissions {
@@ -53,7 +57,7 @@ public final class UeConstants {
         public static final TagResolver PLUGIN_PREFIX = Placeholder.component(
                 "prefix",
                 MiniMessage.miniMessage().deserialize(
-                        "<gradient:#2E5D87:#6C3483>[Unlimited Enchant]</gradient><#CCCCCC>"
+                        "<gradient:#2E5D87:#6C3483>[Unlimited Enchant]</gradient>"
                 )
         );
         public static final String IMMOVABLE_VALUE = "immovable";
