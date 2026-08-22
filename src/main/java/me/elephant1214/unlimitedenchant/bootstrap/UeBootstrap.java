@@ -12,6 +12,7 @@ import me.elephant1214.unlimitedenchant.UeConstants;
 import me.elephant1214.unlimitedenchant.config.UeConfig;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import java.util.Set;
 @SuppressWarnings("UnstableApiUsage")
 public final class UeBootstrap implements PluginBootstrap {
     public static UeConfig config;
-    private final Set<TypedKey<@NotNull Enchantment>> toDisable = Sets.newHashSet();
+    private @Nullable Set<TypedKey<@NotNull Enchantment>> toDisable = Sets.newHashSet();
 
     @Override
     public void bootstrap(@NotNull BootstrapContext ctx) {
@@ -41,7 +42,6 @@ public final class UeBootstrap implements PluginBootstrap {
 
     private void registerEnchantHandlers(@NotNull BootstrapContext ctx) {
         ctx.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler(event -> {
-            UeConstants.LOGGER.info("Enchantment entry add called");
             // key().key() for 1.21.4 compatability
             int maxLevel = config.getOrComputeMaxLevel(event.key().key(), event.builder().maxLevel());
 
@@ -54,7 +54,6 @@ public final class UeBootstrap implements PluginBootstrap {
 
         ctx.getLifecycleManager()
                 .registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT), event -> {
-                    UeConstants.LOGGER.info("postFlatten called");
                     final PostFlattenTagRegistrar<@NotNull Enchantment> registrar = event.registrar();
 
                     for (var entry : registrar.getAllTags().entrySet()) {
@@ -64,8 +63,8 @@ public final class UeBootstrap implements PluginBootstrap {
                         }
                     }
 
-                    this.toDisable.clear();
-                    UeConstants.LOGGER.info("toDisable reset");
+                    // Remove the set entirely after usage
+                    this.toDisable = null;
                 });
     }
 }

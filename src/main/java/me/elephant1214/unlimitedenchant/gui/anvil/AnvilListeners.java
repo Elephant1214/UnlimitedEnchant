@@ -3,7 +3,6 @@ package me.elephant1214.unlimitedenchant.gui.anvil;
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
 import me.elephant1214.unlimitedenchant.util.ItemUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,24 +20,23 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onOpenAnvil(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && ItemUtils.isAnvil(event.getClickedBlock())) {
-            AnvilGui menu = AnvilManager.makeAnvil(event.getPlayer(), event.getClickedBlock());
-            menu.openInventory();
-            event.setCancelled(true);
-        }
+        if (event.getClickedBlock() == null || !ItemUtils.isAnvil(event.getClickedBlock())) return;
+
+        AnvilGui menu = new AnvilGui(event.getPlayer(), event.getClickedBlock());
+        menu.openInventory();
+        event.setCancelled(true);
     }
 
     @EventHandler
     public void onClickInv(InventoryClickEvent event) {
-        AnvilGui holder = AnvilManager.getAnvil((Player) event.getView().getPlayer());
-        if (holder == null || event.getInventory() != holder.getInventory()) return;
+        if (!(event.getInventory().getHolder() instanceof AnvilGui holder)) return;
 
         final ItemStack stack = event.getCurrentItem();
         final boolean immovable = stack != null && ItemUtils.isImmovable(stack);
         if (immovable) {
             event.setCancelled(true);
             if (event.getSlot() == AnvilGui.ANVIL_SLOT) {
-                holder.anvilClicked();
+                holder.openRealAnvil();
             }
         } else if (event.getSlot() == AnvilGui.RESULT_SLOT && holder.canTakeResult()) {
             holder.onTake();
@@ -49,15 +47,14 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onInvDrag(InventoryDragEvent event) {
-        AnvilGui holder = AnvilManager.getAnvil((Player) event.getView().getPlayer());
-        if (holder == null || event.getView().getTopInventory() != holder.getInventory()) return;
+        if (!(event.getInventory().getHolder() instanceof AnvilGui holder)) return;
 
         for (int slot : event.getRawSlots()) {
             ItemStack stack = event.getView().getItem(slot);
             if (stack != null && ItemUtils.isImmovable(stack)) {
                 event.setCancelled(true);
                 if (slot == AnvilGui.ANVIL_SLOT) {
-                    holder.anvilClicked();
+                    holder.openRealAnvil();
                 }
                 break;
             }
@@ -72,8 +69,7 @@ public final class AnvilListeners implements Listener {
 
     @EventHandler
     public void onInvClose(InventoryCloseEvent event) {
-        AnvilGui holder = AnvilManager.getAnvil((Player) event.getView().getPlayer());
-        if (holder == null || holder.getInventory() != event.getInventory()) return;
+        if (!(event.getInventory().getHolder() instanceof AnvilGui holder)) return;
 
         holder.onClose();
     }

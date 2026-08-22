@@ -1,7 +1,5 @@
 package me.elephant1214.unlimitedenchant.gui.anvil;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -19,18 +17,18 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.view.CraftAnvilView;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.view.AnvilView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class AnvilGui implements InventoryHolder {
@@ -41,10 +39,6 @@ public final class AnvilGui implements InventoryHolder {
     public static final int RESULT_SLOT = 16;
     public static final int COST_SLOT = 25;
     private static final int INV_SIZE = 9 * 3;
-    private static final Set<Integer> INTERACT_SLOTS = ImmutableSet.of(10, 12, 16);
-    private static final ItemStack FILLER_STACK = makeFillerStack(Material.GRAY_STAINED_GLASS_PANE);
-    private static final ItemStack WAITING = makeSeparator();
-    private static final ItemStack INVALID = makeFillerStack(Material.BARRIER);
 
     private final @NotNull Player player;
     private final @NotNull AnvilView anvilView;
@@ -56,40 +50,13 @@ public final class AnvilGui implements InventoryHolder {
         this.player = player;
         this.anvilView = buildAnvilView(player, anvil);
         this.anvil = anvil;
-        this.inv = Bukkit.createInventory(player, INV_SIZE, Component.translatable("container.repair"));
+        this.inv = Bukkit.createInventory(this, INV_SIZE, Component.translatable("container.repair"));
     }
 
     private static AnvilView buildAnvilView(@NotNull Player player, @NotNull Block anvil) {
         return MenuType.ANVIL.builder()
                 .location(anvil.getLocation())
                 .build(player);
-    }
-
-    private static ItemStack makeFillerStack(@NotNull Material material) {
-        ItemStack renameStack = new ItemStack(material, 1);
-
-        ItemMeta meta = renameStack.getItemMeta();
-        meta.customName(Component.text(""));
-        renameStack.setItemMeta(meta);
-
-        ItemUtils.makeImmovable(renameStack);
-        return renameStack;
-    }
-
-    private static ItemStack makeSeparator() {
-        ItemStack head = ItemStack.of(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) head.getItemMeta();
-
-        PlayerProfile profile = Bukkit.createProfile(new UUID(0, 0), "");
-        ProfileProperty textures = new ProfileProperty("textures", UeBootstrap.config.customAnvilSeparator());
-        profile.setProperty(textures);
-
-        meta.setPlayerProfile(profile);
-        meta.displayName(Component.text(""));
-        head.setItemMeta(meta);
-
-        ItemUtils.makeImmovable(head);
-        return head;
     }
 
     public void openInventory() {
@@ -117,20 +84,20 @@ public final class AnvilGui implements InventoryHolder {
         boolean has2 = input2 != null;
 
         if (!has1 && !has2) {
-            this.setSlots(WAITING, FILLER_STACK, FILLER_STACK);
+            this.setSlots(AnvilPlaceholders.WAITING, AnvilPlaceholders.FILLER_STACK, AnvilPlaceholders.FILLER_STACK);
             this.canTake = false;
             return;
         }
 
         if (has1 ^ has2) {
-            this.setSlots(INVALID, FILLER_STACK, FILLER_STACK);
+            this.setSlots(AnvilPlaceholders.INVALID, AnvilPlaceholders.FILLER_STACK, AnvilPlaceholders.FILLER_STACK);
             this.canTake = false;
             return;
         }
 
         final @Nullable AnvilOutput result = getRecipe(input1.clone(), input2.clone());
         if (result == null) {
-            this.setSlots(INVALID, FILLER_STACK, FILLER_STACK);
+            this.setSlots(AnvilPlaceholders.INVALID, AnvilPlaceholders.FILLER_STACK, AnvilPlaceholders.FILLER_STACK);
             this.canTake = false;
             return;
         }
@@ -138,7 +105,7 @@ public final class AnvilGui implements InventoryHolder {
         this.canTake = player.getLevel() >= result.cost() || this.creativeMode();
 
         this.setSlots(
-                this.canTake ? WAITING : INVALID,
+                this.canTake ? AnvilPlaceholders.WAITING : AnvilPlaceholders.INVALID,
                 this.canTake ? result.stack() : ItemUtils.makeImmovable(result.stack()),
                 makeCostStack(result.cost())
         );
@@ -148,6 +115,10 @@ public final class AnvilGui implements InventoryHolder {
         return this.canTake;
     }
 
+    /**
+     * Consumes the input items and the player's experience, placing the output in the
+     * result slot.
+     */
     public void onTake() {
         this.inv.setItem(INPUT1_SLOT, null);
         this.inv.setItem(INPUT2_SLOT, null);
@@ -157,6 +128,9 @@ public final class AnvilGui implements InventoryHolder {
                 .onTake(((CraftPlayer) this.player).getHandle(), menu.getItems().get(menu.getResultSlot()));
     }
 
+    /**
+     * Handles returning a player's items when they close the GUI.
+     */
     private void returnItems() {
         ItemStack input1 = this.inv.getItem(INPUT1_SLOT);
         ItemStack input2 = this.inv.getItem(INPUT2_SLOT);
@@ -170,11 +144,18 @@ public final class AnvilGui implements InventoryHolder {
         }
     }
 
+    /**
+     * Starts a task to run {@link AnvilGui#returnItems()} to run one tick after the GUI
+     * is closed.
+     */
     public void onClose() {
-        AnvilManager.removeAnvil(this.player);
         Bukkit.getScheduler().runTaskLater(UnlimitedEnchant.getInstance(), AnvilGui.this::returnItems, 1L);
     }
 
+    /**
+     * Updates the underlying {@link AnvilMenu} with item changes and forces it to
+     * recalculate the result.
+     */
     private @Nullable ItemStack updateAnvil(@Nullable ItemStack input1, @Nullable ItemStack input2) {
         AnvilMenu menu = (AnvilMenu) ((CraftAnvilView) this.anvilView).getHandle();
         AnvilInventory anvil = this.anvilView.getTopInventory();
@@ -185,49 +166,64 @@ public final class AnvilGui implements InventoryHolder {
         return anvil.getResult();
     }
 
+    /**
+     * Uses the {@link AnvilView} to calculate the result and cost of a repair, then
+     * returns both.
+     *
+     * @return null if nothing was produced, otherwise an {@link AnvilOutput} with the
+     * result stack and cost.
+     */
     private @Nullable AnvilOutput getRecipe(ItemStack input1, ItemStack input2) {
         this.anvilView.setMaximumRepairCost(
                 this.bypassLimitPerm()
                         ? 8192 // What are you even doing if you make something cost this much?
-                        : UeBootstrap.config.customAnvilMaxLevel()
+                        : UeBootstrap.config.getAnvilMaxLevel()
         );
 
         ItemStack result = this.updateAnvil(input1, input2);
         if (result == null) return null;
 
-        if (input1.getItemMeta().hasDisplayName()) {
-            ItemMeta meta = result.getItemMeta();
-            meta.displayName(input1.getItemMeta().displayName());
-            result.setItemMeta(meta);
-        }
+        final Map<Enchantment, Integer> enchantments = result.getEnchantments();
+        final ItemMeta input1Meta = input1.getItemMeta().clone();
+
+        // For some reason the anvil doesn't transfer meta on its own
+        result.setItemMeta(input1Meta);
+        result.addEnchantments(enchantments);
 
         return new AnvilOutput(result, this.anvilView.getRepairCost());
     }
 
+    /**
+     * Creates the experience bottle stack that displays the total cost for the repair.
+     */
     private ItemStack makeCostStack(int cost) {
         ItemStack stack = ItemStack.of(Material.EXPERIENCE_BOTTLE);
         stack.setData(DataComponentTypes.MAX_STACK_SIZE, 99);
         stack.setAmount(cost);
 
-        ItemMeta meta = stack.getItemMeta();
-        if (cost > UeBootstrap.config.customAnvilMaxLevel() && !this.bypassLimitPerm() && !this.creativeMode()) {
-            meta.customName(
-                    Component.translatable("container.repair.expensive")
-                            .style(Style.style(NamedTextColor.RED))
-            );
-        } else {
-            meta.customName(
-                    Component.translatable("container.repair.cost", Component.text(cost))
-                            .style(Style.style(this.canTake ? NamedTextColor.GREEN : NamedTextColor.RED))
-            );
-        }
-        stack.setItemMeta(meta);
+        stack.editMeta(meta -> {
+            if (cost > UeBootstrap.config.getAnvilMaxLevel() && !this.bypassLimitPerm() && !this.creativeMode()) {
+                meta.customName(
+                        Component.translatable("container.repair.expensive")
+                                .style(Style.style(NamedTextColor.RED))
+                );
+            } else {
+                meta.customName(
+                        Component.translatable("container.repair.cost", Component.text(cost))
+                                .style(Style.style(this.canTake ? NamedTextColor.GREEN : NamedTextColor.RED))
+                );
+            }
+        });
 
         ItemUtils.makeImmovable(stack);
         return stack;
     }
 
-    public void anvilClicked() {
+    /**
+     * Opens a normal vanilla anvil gui using the same anvil that this was already
+     * created for.
+     */
+    public void openRealAnvil() {
         this.player.openInventory(buildAnvilView(this.player, this.anvil));
     }
 
@@ -235,10 +231,16 @@ public final class AnvilGui implements InventoryHolder {
         this.inv.setItem(ANVIL_SLOT, ItemUtils.makeImmovable(ItemStack.of(Material.ANVIL)));
     }
 
+    /**
+     * The slots where a player is allowed to either place or take items. Used to quickly
+     * fill all other slots with the filler item.
+     */
+    private static final Set<Integer> INTERACT_SLOTS = ImmutableSet.of(10, 12, 16);
+
     private void addFiller() {
         for (int slot = 0; slot < INV_SIZE; slot++) {
             if (this.inv.getItem(slot) == null && !INTERACT_SLOTS.contains(slot)) {
-                this.inv.setItem(slot, FILLER_STACK);
+                this.inv.setItem(slot, AnvilPlaceholders.FILLER_STACK);
             }
         }
     }
