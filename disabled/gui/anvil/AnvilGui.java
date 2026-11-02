@@ -4,8 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.elephant1214.unlimitedenchant.UeConstants;
-import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
-import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
+import me.elephant1214.unlimitedenchant.UnlimitedEnchantOld;
 import me.elephant1214.unlimitedenchant.util.ItemUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -149,7 +148,7 @@ public final class AnvilGui implements InventoryHolder {
      * is closed.
      */
     public void onClose() {
-        Bukkit.getScheduler().runTaskLater(UnlimitedEnchant.getInstance(), AnvilGui.this::returnItems, 1L);
+        Bukkit.getScheduler().runTaskLater(UnlimitedEnchantOld.getInstance(), AnvilGui.this::returnItems, 1L);
     }
 
     /**
@@ -177,7 +176,7 @@ public final class AnvilGui implements InventoryHolder {
         this.anvilView.setMaximumRepairCost(
                 this.bypassLimitPerm()
                         ? 8192 // What are you even doing if you make something cost this much?
-                        : UeBootstrap.config.getAnvilMaxLevel()
+                        : UeBootstrapOld.config.getAnvilMaxLevel()
         );
 
         ItemStack result = this.updateAnvil(input1, input2);
@@ -202,7 +201,7 @@ public final class AnvilGui implements InventoryHolder {
         stack.setAmount(cost);
 
         stack.editMeta(meta -> {
-            if (cost > UeBootstrap.config.getAnvilMaxLevel() && !this.bypassLimitPerm() && !this.creativeMode()) {
+            if (cost > UeBootstrapOld.config.getAnvilMaxLevel() && !this.bypassLimitPerm() && !this.creativeMode()) {
                 meta.customName(
                         Component.translatable("container.repair.expensive")
                                 .style(Style.style(NamedTextColor.RED))

@@ -1,6 +1,6 @@
 package me.elephant1214.unlimitedenchant.gui.anvil;
 
-import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
+import me.elephant1214.unlimitedenchant.UnlimitedEnchantOld;
 import me.elephant1214.unlimitedenchant.util.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -11,10 +11,10 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public final class AnvilListeners implements Listener {
-    private final UnlimitedEnchant plugin;
+public final class AnvilListenersOld implements Listener {
+    private final UnlimitedEnchantOld plugin;
 
-    public AnvilListeners(UnlimitedEnchant plugin) {
+    public AnvilListenersOld(UnlimitedEnchantOld plugin) {
         this.plugin = plugin;
     }
 

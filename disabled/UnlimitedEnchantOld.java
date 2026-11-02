@@ -5,27 +5,26 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import me.elephant1214.unlimitedenchant.blacklist.BlacklistManager;
-import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
 import me.elephant1214.unlimitedenchant.commands.BlacklistCommand;
 import me.elephant1214.unlimitedenchant.commands.LevelSetCommand;
-import me.elephant1214.unlimitedenchant.gui.anvil.AnvilListeners;
+import me.elephant1214.unlimitedenchant.gui.anvil.AnvilListenersOld;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
-public final class UnlimitedEnchant extends JavaPlugin {
+public final class UnlimitedEnchantOld extends JavaPlugin {
     private BlacklistManager blacklist;
 
-    private static UnlimitedEnchant INSTANCE;
+    private static UnlimitedEnchantOld INSTANCE;
 
-    public static UnlimitedEnchant getInstance() {
+    public static UnlimitedEnchantOld getInstance() {
         return INSTANCE;
     }
 
     @Override
     public void onEnable() {
         INSTANCE = this;
-        UeBootstrap.config.save();
+        UeBootstrapOld.config.save();
 
         this.blacklist = new BlacklistManager(this);
         this.registerEvents();
@@ -34,13 +33,13 @@ public final class UnlimitedEnchant extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        UeBootstrap.config.reload();
+        UeBootstrapOld.config.reload();
     }
 
     private void registerEvents() {
         // this.getServer().getPluginManager().registerEvents(new EnchantmentMenu(), this);
-        if (UeBootstrap.config.isAnvilEnabled()) {
-            this.getServer().getPluginManager().registerEvents(new AnvilListeners(this), this);
+        if (UeBootstrapOld.config.isAnvilEnabled()) {
+            this.getServer().getPluginManager().registerEvents(new AnvilListenersOld(this), this);
         }
     }
 

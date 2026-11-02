@@ -33,21 +33,6 @@ public final class UeConstants {
         }
     }
 
-    public static final class Config {
-        public static final String CONFIG_VERSION = "version";
-
-        public static final String ANVIL_ENABLED = "customMenus.anvil.enabled";
-        public static final String ANVIL_MAX_LVL = "customMenus.anvil.maxLevel";
-        public static final String ANVIL_SEPARATOR = "customMenus.anvil.separator";
-        public static final String BLACKLIST_ENABLED = "blacklist.enabled";
-        public static final String BLACKLISTED_ENCHANTS = "blacklist.enchantments";
-        public static final String ENCHANT_LEVEL_RANGES = "levels";
-    }
-
-    public static final class Gui {
-        public static final String DEFAULT_SEPERATOR = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjgyYWQxYjljYjRkZDIxMjU5YzBkNzVhYTMxNWZmMzg5YzNjZWY3NTJiZTM5NDkzMzgxNjRiYWM4NGE5NmUifX19";
-    }
-
     public static final class Permissions {
         public static final String ADMIN = "unlimitedenchant.admin";
         public static final String BYPASS_ANVIL_LIMIT = "unlimitedenchant.anvil.bypass";

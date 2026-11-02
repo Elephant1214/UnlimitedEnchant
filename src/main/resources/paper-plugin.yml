@@ -2,4 +2,5 @@ name: UnlimitedEnchant
 version: '${version}'
 main: me.elephant1214.unlimitedenchant.UnlimitedEnchant
 bootstrapper: me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap
+loader: me.elephant1214.unlimitedenchant.bootstrap.UeLoader
 api-version: '1.21.4'

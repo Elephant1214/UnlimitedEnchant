@@ -2,7 +2,6 @@ package me.elephant1214.unlimitedenchant.gui.anvil;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
 import me.elephant1214.unlimitedenchant.util.ItemUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -35,7 +34,7 @@ final class AnvilPlaceholders {
         SkullMeta meta = (SkullMeta) head.getItemMeta();
 
         PlayerProfile profile = Bukkit.createProfile(new UUID(0, 0), "");
-        ProfileProperty textures = new ProfileProperty("textures", UeBootstrap.config.getAnvilHeadTexture());
+        ProfileProperty textures = new ProfileProperty("textures", UeBootstrapOld.config.getAnvilHeadTexture());
         profile.setProperty(textures);
 
         meta.setPlayerProfile(profile);

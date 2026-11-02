@@ -4,10 +4,13 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
+        maven("https://jitpack.io")
     }
-
-    plugins {
-        id("io.papermc.paperweight.userdev") version("2.0.0-beta.21")
-        id("xyz.jpenilla.run-paper") version("3.0.2")
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "me.elephant1214.plugin-loader-catalog") {
+                useModule("com.github.Elephant1214:plugin-loader-catalog:${requested.version}")
+            }
+        }
     }
 }

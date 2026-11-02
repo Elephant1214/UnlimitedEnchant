@@ -1,0 +1,15 @@
+[versions]
+kotlin = "2.4.0"
+paperweight = "2.0.0-beta.21"
+run-task = "3.1.0"
+
+[libraries]
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+runPaper = { id = "xyz.jpenilla.run-paper", version.ref = "run-task" }
+
+[bundles]
+kotlin = ["kotlin-stdlib"]

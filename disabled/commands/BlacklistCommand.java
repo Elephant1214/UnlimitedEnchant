@@ -13,7 +13,6 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.registry.RegistryKey;
 import me.elephant1214.unlimitedenchant.UeConstants;
 import me.elephant1214.unlimitedenchant.blacklist.BlacklistManager;
-import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.enchantments.Enchantment;
@@ -25,7 +24,7 @@ public final class BlacklistCommand {
         blacklist.then(Commands.literal("add")
                 .then(Commands.argument("enchantment", ArgumentTypes.resource(RegistryKey.ENCHANTMENT))
                         .executes(ctx -> {
-                            if (!UeBootstrap.config.isBlacklistEnabled()) {
+                            if (!UeBootstrapOld.config.isBlacklistEnabled()) {
                                 final Message message = MessageComponentSerializer.message()
                                         .serialize(Component.text("The enchantment blacklist is disabled"));
                                 throw new SimpleCommandExceptionType(message).create();
@@ -42,7 +41,7 @@ public final class BlacklistCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            UeBootstrap.config.addBlacklistedEnchantment(enchantment);
+                            UeBootstrapOld.config.addBlacklistedEnchantment(enchantment);
                             manager.updateBlacklist();
 
                             ctx.getSource().getSender().sendRichMessage(
@@ -62,7 +61,7 @@ public final class BlacklistCommand {
     private static int toggleBlacklist(BlacklistManager manager, CommandContext<CommandSourceStack> ctx, final boolean enable) throws CommandSyntaxException {
         final String status = enable ? "enabled" : "disabled";
 
-        if (enable == UeBootstrap.config.isBlacklistEnabled()) {
+        if (enable == UeBootstrapOld.config.isBlacklistEnabled()) {
             final Message message = MessageComponentSerializer.message()
                     .serialize(Component.text("The enchantment blacklist is already " + status));
             throw new SimpleCommandExceptionType(message).create();

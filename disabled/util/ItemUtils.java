@@ -1,7 +1,7 @@
 package me.elephant1214.unlimitedenchant.util;
 
 import me.elephant1214.unlimitedenchant.UeConstants;
-import me.elephant1214.unlimitedenchant.UnlimitedEnchant;
+import me.elephant1214.unlimitedenchant.UnlimitedEnchantOld;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -31,7 +31,7 @@ public final class ItemUtils {
     /**
      * Key used to mark an item stack as immovable in its {@link PersistentDataContainer}.
      */
-    public static final NamespacedKey IMMOVABLE_KEY = new NamespacedKey(UnlimitedEnchant.getInstance(), UeConstants.Misc.IMMOVABLE_VALUE);
+    public static final NamespacedKey IMMOVABLE_KEY = new NamespacedKey(UnlimitedEnchantOld.getInstance(), UeConstants.Misc.IMMOVABLE_VALUE);
 
     /**
      * Marks the given {@link ItemStack} as immovable by setting a flag in its

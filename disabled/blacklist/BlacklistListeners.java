@@ -3,7 +3,6 @@ package me.elephant1214.unlimitedenchant.blacklist;
 import com.google.common.collect.ImmutableList;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import me.elephant1214.unlimitedenchant.UeConstants;
-import me.elephant1214.unlimitedenchant.bootstrap.UeBootstrap;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftInventoryMerchant;
 import org.bukkit.enchantments.Enchantment;
@@ -128,7 +127,7 @@ public final class BlacklistListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemClicked(@NotNull InventoryClickEvent event) {
-        if (!UeBootstrap.config.isBlacklistEnabled()) return;
+        if (!UeBootstrapOld.config.isBlacklistEnabled()) return;
 
         ItemStack currentItem = event.getCurrentItem();
         Inventory clicked = event.getClickedInventory();
@@ -154,7 +153,7 @@ public final class BlacklistListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemPickup(@NotNull EntityPickupItemEvent event) {
-        if (!UeBootstrap.config.isBlacklistEnabled()) return;
+        if (!UeBootstrapOld.config.isBlacklistEnabled()) return;
 
         ItemStack pickedUp = event.getItem().getItemStack();
         if (pickedUp.getType() == Material.ENCHANTED_BOOK) {
@@ -187,7 +186,7 @@ public final class BlacklistListeners implements Listener {
     }
 
     private void handleSimilar(@NotNull Cancellable event, @NotNull Player player) {
-        if (!UeBootstrap.config.isBlacklistEnabled()) return;
+        if (!UeBootstrapOld.config.isBlacklistEnabled()) return;
 
         PlayerInventory inventory = player.getInventory();
         ItemStack main = inventory.getItemInMainHand();

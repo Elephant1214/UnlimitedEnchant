@@ -1,12 +1,13 @@
 plugins {
     idea
-    java
-    id("io.papermc.paperweight.userdev")
-    id("xyz.jpenilla.run-paper")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.paperweight.userdev)
+    alias(libs.plugins.runPaper)
+    id("me.elephant1214.plugin-loader-catalog") version "1.0.0"
 }
 
-group = "me.elephant1214.unlimitedenchant"
-version = "1.4.0"
+group = "me.elephant1214"
+version = "2.0-SNAPSHOT"
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
@@ -15,7 +16,13 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("26.1.2.build.74-stable")
+    paperweight.paperDevBundle("26.3.build.237-stable")
+}
+
+pluginLoaderCatalog {
+    packageName = "me.elephant1214.unlimitedenchant.bootstrap"
+    className = "VersionCatalog"
+    bundles = setOf("kotlin")
 }
 
 val targetJavaVersion = JavaVersion.VERSION_25
@@ -36,7 +43,7 @@ tasks {
     }
     
     runServer {
-        minecraftVersion("26.2")
+        minecraftVersion("26.3")
         dependsOn(jar)
     }
 }
