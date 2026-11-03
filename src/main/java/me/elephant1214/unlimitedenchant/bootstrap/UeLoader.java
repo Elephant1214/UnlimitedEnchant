@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR;
 
+@SuppressWarnings({"UnstableApiUsage", "unused"})
 public class UeLoader implements PluginLoader {
     @Override
     public void classloader(@NotNull PluginClasspathBuilder classpathBuilder) {
