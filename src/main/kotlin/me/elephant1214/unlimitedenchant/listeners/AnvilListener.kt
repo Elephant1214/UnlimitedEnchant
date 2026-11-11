@@ -53,7 +53,7 @@ class AnvilListener(private val config: () -> UeConfig) : Listener {
 
         val config = config()
         if (config.anvil.allowExpensiveRepairs) {
-            view.maximumRepairCost = config.anvil.maximumCost
+            view.maximumRepairCost = config.anvil.maximumCost + 1
         }
     }
 

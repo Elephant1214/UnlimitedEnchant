@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.elephant1214"
-version = "2.0-SNAPSHOT"
+version = "2.0.0"
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("26.3.build.237-stable")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // 26.3.build.237-stable
 }
 
 pluginLoaderCatalog {
@@ -25,11 +25,15 @@ pluginLoaderCatalog {
     bundles = setOf("kotlin")
 }
 
-val targetJavaVersion = JavaVersion.VERSION_25
+val targetJavaVersion = JavaVersion.VERSION_21
 java {
     targetCompatibility = targetJavaVersion
     sourceCompatibility = targetJavaVersion
-    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+kotlin {
+    jvmToolchain(21)
 }
 
 tasks {
@@ -41,9 +45,12 @@ tasks {
             expand(props)
         }
     }
-    
+
     runServer {
         minecraftVersion("26.3")
         dependsOn(jar)
+        javaLauncher.set(project.javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(25))
+        })
     }
 }

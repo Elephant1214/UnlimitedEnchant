@@ -1,19 +1,21 @@
 package me.elephant1214.unlimitedenchant.config
 
 import me.elephant1214.unlimitedenchant.config.ConfigLoader.Companion.LATEST_VERSION
-import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Comment
 
+@Suppress("unused")
 @ConfigSerializable
 class UeConfig {
-    @Comment("Do not change")
+    /**
+     * The version reference for the current config so that plugin updates won't break them.
+     */
     var configVersion: Int = LATEST_VERSION
     var anvil = Anvil()
-    var blacklist = Blacklist()
 
-    @Comment("namespace -> enchantment -> max level")
+    /**
+     * namespace -> enchantment -> max level
+     */
     var enchantmentLevels: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
     fun getMaximumLevel(enchantment: Enchantment): Int =
@@ -28,52 +30,24 @@ class UeConfig {
 
     @ConfigSerializable
     class Anvil {
-        @Comment("Allow repairs past vanilla's level 39 limit")
+        /**
+         * Increases the maximum cost of an anvil repair to the value of [maximumCost].
+         */
         var allowExpensiveRepairs: Boolean = false
 
-        @Comment("The maximum repair cost allowed while allow-expensive-repairs is enabled. Vanilla is 39.")
+        /**
+         * The maximum cost (inclusive) of an anvil repair when [allowExpensiveRepairs] is true.
+         */
         var maximumCost: Int = 39
         var rename: Rename = Rename()
     }
 
     @ConfigSerializable
     class Rename {
-        @Comment("Changes the cost to rename an item to the configured cost regardless of how many times the item has been in an anvil.")
+        /**
+         * When true, all renames will always cost the value set at [cost].
+         */
         var fixedCost: Boolean = false
         var cost: Int = 1
-    }
-
-    @ConfigSerializable
-    class Blacklist {
-        var enabled: Boolean = false
-
-        @Comment("namespace -> blacklisted enchantments")
-        var enchantments: MutableMap<String, MutableSet<String>> = defaultEnchantments()
-
-        fun isBlacklisted(enchantment: Enchantment): Boolean =
-            enchantments[enchantment.key().key().namespace()]?.contains(enchantment.key().key().value()) == true
-
-        /**
-         * @return false if it was already blacklisted
-         */
-        fun add(enchantment: Enchantment): Boolean =
-            enchantments.getOrPut(enchantment.key().key().namespace()) { mutableSetOf() }.add(enchantment.key.key)
-
-        /**
-         * @return false if it wasn't blacklisted
-         */
-        fun remove(enchantment: Enchantment): Boolean {
-            val namespace = enchantments[enchantment.key().key().namespace()] ?: return false
-            return namespace.remove(enchantment.key().key().value())
-        }
-
-        companion object {
-            private fun defaultEnchantments(): MutableMap<String, MutableSet<String>> = mutableMapOf(
-                Key.MINECRAFT_NAMESPACE to mutableSetOf(
-                    Enchantment.AQUA_AFFINITY.key().key().value(),
-                    Enchantment.BANE_OF_ARTHROPODS.key().key().value()
-                ),
-            )
-        }
     }
 }

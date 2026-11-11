@@ -2,7 +2,6 @@ package me.elephant1214.unlimitedenchant
 
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
-import me.elephant1214.unlimitedenchant.command.blacklistTree
 import me.elephant1214.unlimitedenchant.command.levelSet
 import me.elephant1214.unlimitedenchant.config.ConfigHolder
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
@@ -14,7 +13,6 @@ class UnlimitedEnchant(
     private val configLoader: ConfigLoader,
     override var config: UeConfig
 ) : JavaPlugin(), ConfigHolder {
-    //private val blacklistListeners = BlacklistListeners(this)
 
     override fun onEnable() {
         registerCommands()
@@ -31,7 +29,6 @@ class UnlimitedEnchant(
                 requires { it.sender.hasPermission(UePermission.ADMIN) }
 
                 levelSet(this@UnlimitedEnchant)
-                blacklistTree(this@UnlimitedEnchant)
             }
 
             commands.registrar().register(

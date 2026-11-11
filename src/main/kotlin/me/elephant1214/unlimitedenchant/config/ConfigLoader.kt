@@ -1,16 +1,20 @@
 package me.elephant1214.unlimitedenchant.config
 
-import net.kyori.adventure.key.Key
+import me.elephant1214.unlimitedenchant.LOGGER
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.NodePath
 import org.spongepowered.configurate.transformation.ConfigurationTransformation
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
-class ConfigLoader(dataDir: Path) {
+class ConfigLoader(private val dataDir: Path) {
     private val loader =
-        YamlConfigurationLoader.builder().path(dataDir.resolve("config.yml")).nodeStyle(NodeStyle.BLOCK)
+        YamlConfigurationLoader.builder()
+            .path(dataDir.resolve("config.yml"))
+            .nodeStyle(NodeStyle.BLOCK)
             .defaultOptions { opts ->
                 opts.header(HEADER)
             }.build()
@@ -25,9 +29,21 @@ class ConfigLoader(dataDir: Path) {
                 node.node(VERSION_KEY).from(oldVersion)
                 oldVersion.set(null)
             }
+
+            val version = MIGRATIONS.version(node)
+            if (version < LATEST_VERSION) {
+                backup(version)
+            }
+
             MIGRATIONS.apply(node)
         }
         return node.get(UeConfig::class.java) ?: UeConfig()
+    }
+
+    private fun backup(version: Int) {
+        val name = if (version < 0) "config-unversioned.yml" else "config-v$version.yml"
+        Files.copy(dataDir.resolve("config.yml"), dataDir.resolve(name), StandardCopyOption.REPLACE_EXISTING)
+        LOGGER.info("Migrating config from version $version to $LATEST_VERSION, backup saved as $name")
     }
 
     fun save(config: UeConfig) {
@@ -37,11 +53,8 @@ class ConfigLoader(dataDir: Path) {
 
     companion object {
         private val HEADER = """
-            This configuration allows you to modify the maximum levels of all registered enchantments.
-            Note that the effects of some enchantments scale very little with higher levels, and a few have no changes.
-            For a complete list of vanilla enchantments and their resource locations, visit:
-            https://minecraft.wiki/w/Java_Edition_data_values#Enchantments
-            The effects of Channeling, Curse of Binding, Curse of Vanishing, Flame, Infinity, Mending, and Silk Touch do not change with increased levels.
+            Unlimited Enchant configuration
+            Documentation for every option at: https://elephant1214.github.io/UnlimitedEnchant/config
         """.trimIndent()
 
         private const val VERSION_KEY = "config-version"
@@ -64,23 +77,8 @@ class ConfigLoader(dataDir: Path) {
                         levels.parent()!!.node("enchantment-levels").from(levels)
                         levels.set(null)
                         null
-                    }.addAction(NodePath.path("blacklist", "enchantments")) { _, enchantments ->
-                        if (!enchantments.isList) return@addAction null
-                        // The old list did not store a namespace. Because of that, this assumes everything is
-                        // `minecraft` and anything else must be corrected manually.
-                        val migrated = mutableMapOf<String, MutableSet<String>>()
-                        enchantments.getList(String::class.java).orEmpty().forEach { entry ->
-                            if (!Key.parseable(entry)) return@forEach
-
-                            val key = Key.key(entry)
-                            migrated.getOrPut(key.namespace()) { mutableSetOf() }.add(key.value())
-                        }
-                        enchantments.set(null)
-                        migrated.forEach { (namespace, values) ->
-                            enchantments
-                                .node(namespace)
-                                .setList(String::class.java, values.toList())
-                        }
+                    }.addAction(NodePath.path("blacklist")) { _, blacklist ->
+                        blacklist.set(null)
                         null
                     }
                     .build()

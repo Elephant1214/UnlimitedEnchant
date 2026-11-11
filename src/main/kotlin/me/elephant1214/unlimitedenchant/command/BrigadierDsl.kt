@@ -9,7 +9,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import me.elephant1214.unlimitedenchant.MESSAGE_SERIALIZER
+import io.papermc.paper.command.brigadier.MessageComponentSerializer
 import me.elephant1214.unlimitedenchant.MINI_MESSAGE
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
@@ -42,5 +42,5 @@ inline fun <reified T : Any> Ctx.arg(name: String): T = getArgument(name, T::cla
 
 fun fail(message: String, vararg resolvers: TagResolver): Nothing =
     throw SimpleCommandExceptionType(
-        MESSAGE_SERIALIZER.serialize(MINI_MESSAGE.deserialize(message, *resolvers))
+        MessageComponentSerializer.message().serialize(MINI_MESSAGE.deserialize(message, *resolvers))
     ).create()

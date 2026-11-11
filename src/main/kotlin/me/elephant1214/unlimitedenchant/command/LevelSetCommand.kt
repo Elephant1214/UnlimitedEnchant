@@ -32,8 +32,8 @@ fun LiteralArgumentBuilder<Source>.levelSet(configHolder: ConfigHolder) = litera
 
                 configHolder.config.setMaximumLevel(enchantment, level)
                 configHolder.save()
-                ctx.source.sendRichReply(
-                    "<prefix> <red>Set the maximum level for <enchantment> to <level>.\n<u>You must restart your server for this change to take effect.</u>",
+                ctx.source.sender.sendRichMessage(
+                    "<prefix> <#CCCCCC>Set the maximum level for <enchantment> to <level>.\nYou must restart your server for this change to take effect.",
                     *resolvers,
                 )
             }

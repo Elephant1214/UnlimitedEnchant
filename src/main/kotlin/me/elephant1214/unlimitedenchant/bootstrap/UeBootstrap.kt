@@ -14,6 +14,7 @@ import me.elephant1214.unlimitedenchant.config.UeConfig
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.plugin.java.JavaPlugin
+import java.nio.file.Files
 
 @Suppress("UnstableApiUsage", "unused")
 class UeBootstrap : PluginBootstrap {
