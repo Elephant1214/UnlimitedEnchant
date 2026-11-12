@@ -2,6 +2,7 @@
 kotlin = "2.4.0"
 paperweight = "2.0.0-beta.21"
 run-task = "3.1.0"
+minotaur = "2.+"
 
 [libraries]
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
@@ -10,6 +11,7 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 runPaper = { id = "xyz.jpenilla.run-paper", version.ref = "run-task" }
+minotair = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
 
 [bundles]
 kotlin = ["kotlin-stdlib"]
