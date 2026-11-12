@@ -54,7 +54,7 @@ class ConfigLoader(private val dataDir: Path) {
     companion object {
         private val HEADER = """
             Unlimited Enchant configuration
-            Documentation for every option at: https://elephant1214.github.io/UnlimitedEnchant/config
+            Documentation for every option at: https://elephant1214.me/UnlimitedEnchant/config.html
         """.trimIndent()
 
         private const val VERSION_KEY = "config-version"
