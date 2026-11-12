@@ -78,4 +78,13 @@ modrinth {
     )
     loaders.addAll("paper", "purpur")
     changelog.set(System.getenv("CHANGELOG").orEmpty())
+    syncBodyFrom.set(
+        rootProject.file("README.md").readText()
+            .replace(
+                Regex(
+                    "<!-- modrinth_exclude\\.start -->.*?<!-- modrinth_exclude\\.end -->\\s*",
+                    RegexOption.DOT_MATCHES_ALL
+                ), ""
+            )
+    )
 }
