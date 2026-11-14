@@ -30,7 +30,7 @@ data pack.
 
 ## Documentation
 
-Full config reference, commands, and permissions: **https://elephant1214.me/UnlimitedEnchant/**
+Full config reference, commands, and permissions: **https://elephant1214.github.io/UnlimitedEnchant/**
 
 ## Compatibility
 
