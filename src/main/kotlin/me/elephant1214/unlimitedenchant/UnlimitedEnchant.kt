@@ -2,16 +2,20 @@ package me.elephant1214.unlimitedenchant
 
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import me.elephant1214.unlimitedenchant.bootstrap.VanillaValues
 import me.elephant1214.unlimitedenchant.command.levelSet
 import me.elephant1214.unlimitedenchant.config.ConfigHolder
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
 import me.elephant1214.unlimitedenchant.config.UeConfig
 import me.elephant1214.unlimitedenchant.listeners.AnvilListener
+import me.elephant1214.unlimitedenchant.listeners.BlacklistListener
+import net.kyori.adventure.key.Key
 import org.bukkit.plugin.java.JavaPlugin
 
 class UnlimitedEnchant(
     private val configLoader: ConfigLoader,
-    override var config: UeConfig
+    override var config: UeConfig,
+    val vanillaValues: Map<Key, VanillaValues>,
 ) : JavaPlugin(), ConfigHolder {
 
     override fun onEnable() {
@@ -21,8 +25,10 @@ class UnlimitedEnchant(
 
     fun registerEvents() {
         server.pluginManager.registerEvents(AnvilListener { config }, this)
+        server.pluginManager.registerEvents(BlacklistListener { config }, this)
     }
 
+    @Suppress("UnstableApiUsage")
     fun registerCommands() {
         lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { commands ->
             val root = Commands.literal("unlimitedenchant").apply {

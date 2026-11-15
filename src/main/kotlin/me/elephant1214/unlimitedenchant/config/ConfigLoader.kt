@@ -1,8 +1,14 @@
 package me.elephant1214.unlimitedenchant.config
 
+import io.leangen.geantyref.GenericTypeReflector.erase
 import me.elephant1214.unlimitedenchant.LOGGER
+import me.elephant1214.unlimitedenchant.config.annotations.Clamp
+import me.elephant1214.unlimitedenchant.config.serializers.KeySerializer
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.NodePath
+import org.spongepowered.configurate.objectmapping.ObjectMapper
+import org.spongepowered.configurate.objectmapping.meta.PostProcessor
 import org.spongepowered.configurate.transformation.ConfigurationTransformation
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
@@ -11,13 +17,30 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 class ConfigLoader(private val dataDir: Path) {
+    private val mapperFactory = ObjectMapper.factoryBuilder().addPostProcessor { type ->
+        val fields = erase(type).declaredFields.filter { it.isAnnotationPresent(Clamp::class.java) }
+        if (fields.isEmpty()) null else PostProcessor { instance ->
+            for (field in fields) {
+                field.isAccessible = true
+                val clamp = field.getAnnotation(Clamp::class.java)
+                val value = (field.get(instance) as? Number ?: continue).toLong()
+                val clamped = value.coerceIn(clamp.min, clamp.max)
+                if (clamped != value) {
+                    LOGGER.warn("${field.name} = $value is out of range, using $clamped")
+                    field.set(instance, clamped.toInt())
+                }
+            }
+        }
+    }.build()
+
     private val loader =
-        YamlConfigurationLoader.builder()
-            .path(dataDir.resolve("config.yml"))
-            .nodeStyle(NodeStyle.BLOCK)
+        YamlConfigurationLoader.builder().path(dataDir.resolve("config.yml")).nodeStyle(NodeStyle.BLOCK)
             .defaultOptions { opts ->
-                opts.header(HEADER)
+                opts.serializers {
+                    it.register(Key::class.java, KeySerializer).registerAnnotatedObjects(mapperFactory)
+                }.header(HEADER)
             }.build()
+
     private lateinit var node: CommentedConfigurationNode
 
     fun load(): UeConfig {
@@ -59,31 +82,40 @@ class ConfigLoader(private val dataDir: Path) {
 
         private const val VERSION_KEY = "config-version"
 
-        private val MIGRATIONS = ConfigurationTransformation.versionedBuilder()
-            .versionKey(VERSION_KEY)
+        private val MIGRATIONS = ConfigurationTransformation.versionedBuilder().versionKey(VERSION_KEY)
             .addVersion(1, ConfigurationTransformation.empty())
-            .addVersion(
-                2, ConfigurationTransformation.builder()
-                    .addAction(NodePath.path("customMenus")) { _, menus ->
-                        val old = menus.node("anvil")
-                        if (!old.virtual()) {
-                            val anvil = menus.parent()!!.node("anvil")
-                            anvil.node("allow-expensive-repairs").from(old.node("enabled"))
-                            anvil.node("maximum-cost").from(old.node("maxLevel"))
+            .addVersion(2, ConfigurationTransformation.builder().addAction(NodePath.path("customMenus")) { _, menus ->
+                val old = menus.node("anvil")
+                if (!old.virtual()) {
+                    val anvil = menus.parent()!!.node("anvil")
+                    anvil.node("allow-expensive-repairs").from(old.node("enabled"))
+                    anvil.node("maximum-cost").from(old.node("maxLevel"))
+                }
+                menus.set(null)
+                null
+            }.addAction(NodePath.path("levels")) { _, levels ->
+                levels.parent()!!.node("enchantment-levels").from(levels)
+                levels.set(null)
+                null
+            }.addAction(NodePath.path("blacklist")) { _, blacklist ->
+                blacklist.set(null)
+                null
+            }.build()).addVersion(
+                3, ConfigurationTransformation.builder()
+                    // enchantment-levels: namespace -> enchantment -> level
+                    // becomes enchantments: "namespace:enchantment" -> { max-level: level }
+                    .addAction(NodePath.path("enchantment-levels")) { _, old ->
+                        val enchantments = old.parent()!!.node("enchantments")
+                        for ((namespace, enchants) in old.childrenMap()) {
+                            for ((name, value) in enchants.childrenMap()) {
+                                val entry = enchantments.node("$namespace:$name")
+                                if (value.isMap) entry.from(value) else entry.node("max-level").raw(value.raw())
+                            }
                         }
-                        menus.set(null)
+                        old.set(null)
                         null
-                    }.addAction(NodePath.path("levels")) { _, levels ->
-                        levels.parent()!!.node("enchantment-levels").from(levels)
-                        levels.set(null)
-                        null
-                    }.addAction(NodePath.path("blacklist")) { _, blacklist ->
-                        blacklist.set(null)
-                        null
-                    }
-                    .build()
-            )
-            .build()
+                    }.build()
+            ).build()
 
         val LATEST_VERSION = MIGRATIONS.latestVersion()
     }

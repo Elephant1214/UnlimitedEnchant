@@ -6,20 +6,21 @@ import io.papermc.paper.plugin.bootstrap.PluginProviderContext
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.data.EnchantmentRegistryEntry
 import io.papermc.paper.registry.event.RegistryEvents
-import me.elephant1214.unlimitedenchant.LOGGER
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant
+import me.elephant1214.unlimitedenchant.adventureKey
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
 import me.elephant1214.unlimitedenchant.config.UeConfig
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.plugin.java.JavaPlugin
-import java.nio.file.Files
 
 @Suppress("UnstableApiUsage", "unused")
 class UeBootstrap : PluginBootstrap {
     private lateinit var loader: ConfigLoader
     private lateinit var config: UeConfig
+    private val vanillaValues = mutableMapOf<Key, VanillaValues>()
 
     override fun bootstrap(ctx: BootstrapContext) {
         loader = ConfigLoader(ctx.dataDirectory)
@@ -31,20 +32,30 @@ class UeBootstrap : PluginBootstrap {
     override fun createPlugin(ctx: PluginProviderContext): JavaPlugin {
         loader.save(config)
 
-        return UnlimitedEnchant(loader, config)
+        return UnlimitedEnchant(loader, config, vanillaValues)
     }
 
     private fun registerEnchantmentHandlers(ctx: BootstrapContext) {
         val toDisable = mutableSetOf<TypedKey<Enchantment>>()
 
         ctx.lifecycleManager.registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler { event ->
-            val level = computeMaximumLevel(event.key().key(), event.builder().maxLevel())
+            vanillaValues[event.adventureKey] = VanillaValues(
+                weight = event.builder().weight(),
+                maxLevel = event.builder().maxLevel(),
+                anvilCost = event.builder().anvilCost(),
+            )
 
-            if (level > 0) {
-                event.builder().maxLevel(level)
+            val settings = computeSettings(event.adventureKey, event.builder())
+
+            // `maxLevel` is never null after `computeSettings`
+            if (settings.maxLevel!! > 0) {
+                event.builder().maxLevel(settings.maxLevel!!)
             } else {
                 toDisable.add(event.key())
             }
+
+            if (settings.weight != null) event.builder().weight(settings.weight!!)
+            if (settings.anvilCost != null) event.builder().anvilCost(settings.anvilCost!!)
         })
 
         ctx.lifecycleManager.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT)) { event ->
@@ -62,23 +73,18 @@ class UeBootstrap : PluginBootstrap {
     }
 
     /**
-     * Computes the maximum level that the plugin should set for an enchantment.
-     * If zero, the enchantment will be disabled entirely.
+     * Fills the [UeConfig.EnchantmentOptions.maxLevel] if it's currently missing.
      *
      * @param key The namespaced key for the enchantment
-     * @param default The vanilla maximum level for the enchantment
+     * @param builder The registry entry builder for the enchantment
      */
-    private fun computeMaximumLevel(key: Key, default: Int): Int {
-        val keyNamespace = key.namespace()
-        val keyValue = key.value()
-
-        val namespace = config.enchantmentLevels.getOrPut(keyNamespace) { mutableMapOf() }
-        val level = namespace.getOrPut(keyValue) { default }
-
-        return when {
-            level == 0 -> 0
-            level < 0 -> default.also { LOGGER.warn("Invalid max level $level for $key, using $default") }
-            else -> level.coerceAtMost(255)
+    private fun computeSettings(key: Key, builder: EnchantmentRegistryEntry.Builder): UeConfig.EnchantmentOptions {
+        val configured = config.enchantments.getOrElse(key) {
+            UeConfig.EnchantmentOptions().apply {
+                maxLevel = builder.maxLevel()
+            }
         }
+        if (configured.maxLevel == null) configured.maxLevel = builder.maxLevel()
+        return configured
     }
 }
