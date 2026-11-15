@@ -1,7 +1,5 @@
 package me.elephant1214.unlimitedenchant
 
-import io.papermc.paper.ServerBuildInfo
-import io.papermc.paper.command.brigadier.MessageComponentSerializer
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.slf4j.LoggerFactory

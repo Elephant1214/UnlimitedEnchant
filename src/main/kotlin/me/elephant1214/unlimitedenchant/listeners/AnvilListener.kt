@@ -23,6 +23,7 @@ import org.bukkit.inventory.view.AnvilView
 
 private const val VANILLA_TOO_EXPENSIVE: Int = 40
 
+@Suppress("UnstableApiUsage")
 class AnvilListener(private val config: () -> UeConfig) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -82,7 +83,6 @@ class AnvilListener(private val config: () -> UeConfig) : Listener {
 private fun InventoryView.takePlayer(): Player? =
     (player as? Player)?.takeIf { it.gameMode != GameMode.CREATIVE }
 
-@Suppress("UsePropertyAccessSyntax")
 private fun Player.sendFakeInstabuild() {
     val handle = (this as CraftPlayer).handle
     val fake = Abilities().apply {
