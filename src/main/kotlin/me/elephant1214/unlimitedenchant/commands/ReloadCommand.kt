@@ -1,4 +1,4 @@
-package me.elephant1214.unlimitedenchant.command
+package me.elephant1214.unlimitedenchant.commands
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import me.elephant1214.unlimitedenchant.PLUGIN_PREFIX

@@ -1,4 +1,6 @@
-package me.elephant1214.unlimitedenchant.command
+@file:Suppress("UnstableApiUsage")
+
+package me.elephant1214.unlimitedenchant.commands
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.ArgumentType

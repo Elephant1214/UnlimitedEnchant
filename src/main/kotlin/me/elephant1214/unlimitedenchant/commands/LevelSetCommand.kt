@@ -1,4 +1,4 @@
-package me.elephant1214.unlimitedenchant.command
+package me.elephant1214.unlimitedenchant.commands
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.enchantments.Enchantment
 
+@Suppress("UnstableApiUsage")
 fun LiteralArgumentBuilder<Source>.levelSet(configHolder: ConfigHolder) = literal("set") {
     argument("enchantment", ArgumentTypes.resource(RegistryKey.ENCHANTMENT)) {
         argument("level", IntegerArgumentType.integer(0, 255)) {

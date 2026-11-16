@@ -3,8 +3,8 @@ package me.elephant1214.unlimitedenchant
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import me.elephant1214.unlimitedenchant.bootstrap.VanillaValuesMap
-import me.elephant1214.unlimitedenchant.command.levelSet
-import me.elephant1214.unlimitedenchant.command.reload
+import me.elephant1214.unlimitedenchant.commands.levelSet
+import me.elephant1214.unlimitedenchant.commands.reload
 import me.elephant1214.unlimitedenchant.config.ConfigHolder
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
 import me.elephant1214.unlimitedenchant.config.UeConfig
