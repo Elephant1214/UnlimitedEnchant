@@ -4,4 +4,6 @@ interface ConfigHolder {
     val config: UeConfig
 
     fun save()
+
+    fun reload()
 }

@@ -4,6 +4,7 @@ import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import me.elephant1214.unlimitedenchant.bootstrap.VanillaValues
 import me.elephant1214.unlimitedenchant.command.levelSet
+import me.elephant1214.unlimitedenchant.command.reload
 import me.elephant1214.unlimitedenchant.config.ConfigHolder
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
 import me.elephant1214.unlimitedenchant.config.UeConfig
@@ -12,6 +13,7 @@ import me.elephant1214.unlimitedenchant.listeners.BlacklistListener
 import net.kyori.adventure.key.Key
 import org.bukkit.plugin.java.JavaPlugin
 
+@Suppress("UnstableApiUsage")
 class UnlimitedEnchant(
     private val configLoader: ConfigLoader,
     override var config: UeConfig,
@@ -19,6 +21,7 @@ class UnlimitedEnchant(
 ) : JavaPlugin(), ConfigHolder {
 
     override fun onEnable() {
+        //config.warnUnknownKeys()
         registerCommands()
         registerEvents()
     }
@@ -28,12 +31,12 @@ class UnlimitedEnchant(
         server.pluginManager.registerEvents(BlacklistListener { config }, this)
     }
 
-    @Suppress("UnstableApiUsage")
     fun registerCommands() {
         lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { commands ->
             val root = Commands.literal("unlimitedenchant").apply {
                 requires { it.sender.hasPermission(UePermission.ADMIN) }
 
+                reload(this@UnlimitedEnchant)
                 levelSet(this@UnlimitedEnchant)
             }
 
@@ -47,6 +50,7 @@ class UnlimitedEnchant(
 
     override fun reloadConfig() {
         config = configLoader.load()
+        //config.warnUnknownKeys()
     }
 
     override fun saveConfig() {
@@ -55,5 +59,9 @@ class UnlimitedEnchant(
 
     override fun save() {
         saveConfig()
+    }
+
+    override fun reload() {
+        reloadConfig()
     }
 }
