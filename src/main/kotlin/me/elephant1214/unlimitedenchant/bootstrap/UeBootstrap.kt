@@ -43,6 +43,8 @@ class UeBootstrap : PluginBootstrap {
                 weight = event.builder().weight(),
                 maxLevel = event.builder().maxLevel(),
                 anvilCost = event.builder().anvilCost(),
+                minCost = event.builder().minimumCost(),
+                maxCost = event.builder().maximumCost(),
             )
 
             val settings = computeSettings(event.adventureKey, event.builder())
