@@ -112,7 +112,12 @@ class ConfigLoader(private val dataDir: Path) {
                         for ((namespace, enchants) in old.childrenMap()) {
                             for ((name, value) in enchants.childrenMap()) {
                                 val entry = enchantments.node("$namespace:$name")
-                                if (value.isMap) entry.from(value) else entry.node("max-level").raw(value.raw())
+                                when {
+                                    value.isMap -> entry.from(value)
+                                    value.getInt(-1) >= 0 -> entry.node("max-level").raw(value.raw())
+                                    // Negative or invalid levels defaulted to vanilla before, so skip them and let bootstrap fill in vanilla
+                                    else -> {}
+                                }
                             }
                         }
                         old.set(null)
