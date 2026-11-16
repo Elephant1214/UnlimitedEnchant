@@ -84,7 +84,7 @@ class AnvilListener(private val config: () -> UeConfig) : Listener {
         }
 
         if (view.maximumRepairCost >= VANILLA_TOO_EXPENSIVE && view.repairCost >= VANILLA_TOO_EXPENSIVE) {
-            player.sendFakeInstabuild()
+            if (player.level >= view.repairCost) player.sendFakeInstabuild() else player.restoreAbilities()
         }
     }
 }
