@@ -25,7 +25,9 @@ private const val VANILLA_TOO_EXPENSIVE: Int = 40
 
 @Suppress("UnstableApiUsage")
 class AnvilListener(private val config: () -> UeConfig) : Listener {
-
+    /**
+     * Resets the abilities that the client thinks it has when the anvil is closed.
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     fun onClose(event: InventoryCloseEvent) {
         if (event.inventory !is AnvilInventory) return
@@ -34,6 +36,9 @@ class AnvilListener(private val config: () -> UeConfig) : Listener {
         player.restoreAbilities()
     }
 
+    /**
+     * Updates the title and maximum repair cost prior to the menu being displayed.
+     */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventory !is AnvilInventory) return
@@ -58,6 +63,10 @@ class AnvilListener(private val config: () -> UeConfig) : Listener {
         }
     }
 
+    /**
+     * Handles telling the client it has instabuild to bypass the client-sided level limit. Also handles the free
+     * permission and making renames free.
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPrepareAnvil(event: PrepareAnvilEvent) {
         val view = event.view

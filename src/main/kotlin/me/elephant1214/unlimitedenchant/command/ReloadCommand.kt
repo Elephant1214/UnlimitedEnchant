@@ -9,7 +9,7 @@ fun LiteralArgumentBuilder<Source>.reload(configHolder: ConfigHolder) = literal(
     exec { ctx ->
         configHolder.reload()
         ctx.source.sender.sendRichMessage(
-            "<prefix> <#CCCCCC>Reloaded! A restart is still required if you changed any enchantment levels.",
+            "<prefix> <#CCCCCC>Reloaded! A restart is still required if you changed any enchantment options.",
             PLUGIN_PREFIX,
         )
     }

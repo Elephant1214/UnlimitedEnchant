@@ -4,6 +4,7 @@ import io.leangen.geantyref.GenericTypeReflector.erase
 import me.elephant1214.unlimitedenchant.LOGGER
 import me.elephant1214.unlimitedenchant.config.annotations.Clamp
 import me.elephant1214.unlimitedenchant.config.serializers.KeySerializer
+import me.elephant1214.unlimitedenchant.config.serializers.LevelCostSerializer
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.NodePath
@@ -37,7 +38,9 @@ class ConfigLoader(private val dataDir: Path) {
         YamlConfigurationLoader.builder().path(dataDir.resolve("config.yml")).nodeStyle(NodeStyle.BLOCK)
             .defaultOptions { opts ->
                 opts.serializers {
-                    it.register(Key::class.java, KeySerializer).registerAnnotatedObjects(mapperFactory)
+                    it.register(Key::class.java, KeySerializer)
+                        .register(LevelCost::class.java, LevelCostSerializer)
+                        .registerAnnotatedObjects(mapperFactory)
                 }.header(HEADER)
             }.build()
 

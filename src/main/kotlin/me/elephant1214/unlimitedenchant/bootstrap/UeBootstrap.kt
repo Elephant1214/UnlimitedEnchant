@@ -1,5 +1,6 @@
 package me.elephant1214.unlimitedenchant.bootstrap
 
+import com.google.common.collect.ImmutableMap
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext
@@ -11,6 +12,7 @@ import io.papermc.paper.registry.event.RegistryEvents
 import me.elephant1214.unlimitedenchant.UnlimitedEnchant
 import me.elephant1214.unlimitedenchant.adventureKey
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
+import me.elephant1214.unlimitedenchant.config.LevelCost
 import me.elephant1214.unlimitedenchant.config.UeConfig
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
@@ -32,7 +34,7 @@ class UeBootstrap : PluginBootstrap {
     override fun createPlugin(ctx: PluginProviderContext): JavaPlugin {
         loader.save(config)
 
-        return UnlimitedEnchant(loader, config, vanillaValues)
+        return UnlimitedEnchant(loader, config, ImmutableMap.copyOf(vanillaValues))
     }
 
     private fun registerEnchantmentHandlers(ctx: BootstrapContext) {
@@ -43,8 +45,8 @@ class UeBootstrap : PluginBootstrap {
                 weight = event.builder().weight(),
                 maxLevel = event.builder().maxLevel(),
                 anvilCost = event.builder().anvilCost(),
-                minCost = event.builder().minimumCost(),
-                maxCost = event.builder().maximumCost(),
+                minCost = LevelCost.of(event.builder().minimumCost()),
+                maxCost = LevelCost.of(event.builder().maximumCost()),
             )
 
             val settings = computeSettings(event.adventureKey, event.builder())
@@ -56,8 +58,14 @@ class UeBootstrap : PluginBootstrap {
                 toDisable.add(event.key())
             }
 
-            if (settings.weight != null) event.builder().weight(settings.weight!!)
-            if (settings.anvilCost != null) event.builder().anvilCost(settings.anvilCost!!)
+            settings.weight?.let { event.builder().weight(it) }
+            settings.anvilCost?.let { event.builder().anvilCost(it) }
+            settings.minCost?.let {
+                event.builder().minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(it.base, it.perLevel))
+            }
+            settings.maxCost?.let {
+                event.builder().maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(it.base, it.perLevel))
+            }
         })
 
         ctx.lifecycleManager.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT)) { event ->
@@ -81,11 +89,7 @@ class UeBootstrap : PluginBootstrap {
      * @param builder The registry entry builder for the enchantment
      */
     private fun computeSettings(key: Key, builder: EnchantmentRegistryEntry.Builder): UeConfig.EnchantmentOptions {
-        val configured = config.enchantments.getOrElse(key) {
-            UeConfig.EnchantmentOptions().apply {
-                maxLevel = builder.maxLevel()
-            }
-        }
+        val configured = config.enchantments.getOrPut(key) { UeConfig.EnchantmentOptions() }
         if (configured.maxLevel == null) configured.maxLevel = builder.maxLevel()
         return configured
     }

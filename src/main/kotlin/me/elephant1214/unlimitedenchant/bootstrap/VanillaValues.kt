@@ -1,15 +1,17 @@
 package me.elephant1214.unlimitedenchant.bootstrap
 
-import io.papermc.paper.registry.data.EnchantmentRegistryEntry
+import me.elephant1214.unlimitedenchant.config.LevelCost
+import net.kyori.adventure.key.Key
+
+typealias VanillaValuesMap = Map<Key, VanillaValues>
 
 /**
  * A copy of the vanilla settings for an enchantment in the game.
  */
-@Suppress("UnstableApiUsage")
 data class VanillaValues(
     val weight: Int,
     val maxLevel: Int,
     val anvilCost: Int,
-    val minCost: EnchantmentRegistryEntry.EnchantmentCost,
-    val maxCost: EnchantmentRegistryEntry.EnchantmentCost,
+    val minCost: LevelCost,
+    val maxCost: LevelCost,
 )
