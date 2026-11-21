@@ -7,7 +7,8 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
 object LevelCostSerializer : TypeSerializer<LevelCost> {
-    private const val MAX = 1024
+    const val MIN = 0
+    const val MAX = 1024
 
     override fun deserialize(type: Type, node: ConfigurationNode): LevelCost = LevelCost(
         base = node.node("base").readClamped(),
@@ -24,8 +25,8 @@ object LevelCostSerializer : TypeSerializer<LevelCost> {
     }
 
     private fun ConfigurationNode.readClamped(): Int {
-        val value = getInt(0)
-        val clamped = value.coerceIn(0, MAX)
+        val value = getInt(MIN)
+        val clamped = value.coerceIn(MIN, MAX)
         if (clamped != value) LOGGER.warn("${path()} = $value is out of range, using $clamped")
         return clamped
     }

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.elephant1214"
-version = "2.1.0-rc.2"
+version = "2.1.0"
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 

@@ -1,6 +1,7 @@
 package me.elephant1214.unlimitedenchant.bootstrap
 
 import com.google.common.collect.ImmutableMap
+import com.google.common.collect.ImmutableSet
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext
@@ -18,11 +19,14 @@ import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.plugin.java.JavaPlugin
 
+typealias DisabledEnchantments = Set<Key>
+
 @Suppress("UnstableApiUsage", "unused")
 class UeBootstrap : PluginBootstrap {
     private lateinit var loader: ConfigLoader
     private lateinit var config: UeConfig
     private val vanillaValues = mutableMapOf<Key, VanillaValues>()
+    private val disabled = mutableSetOf<TypedKey<Enchantment>>()
 
     override fun bootstrap(ctx: BootstrapContext) {
         loader = ConfigLoader(ctx.dataDirectory)
@@ -34,12 +38,15 @@ class UeBootstrap : PluginBootstrap {
     override fun createPlugin(ctx: PluginProviderContext): JavaPlugin {
         loader.save(config)
 
-        return UnlimitedEnchant(loader, config, ImmutableMap.copyOf(vanillaValues))
+        return UnlimitedEnchant(
+            loader,
+            config,
+            ImmutableMap.copyOf(vanillaValues),
+            ImmutableSet.copyOf(disabled.map { it.key() }),
+        )
     }
 
     private fun registerEnchantmentHandlers(ctx: BootstrapContext) {
-        val toDisable = mutableSetOf<TypedKey<Enchantment>>()
-
         ctx.lifecycleManager.registerEventHandler(RegistryEvents.ENCHANTMENT.entryAdd().newHandler { event ->
             vanillaValues[event.adventureKey] = VanillaValues(
                 weight = event.builder().weight(),
@@ -55,7 +62,7 @@ class UeBootstrap : PluginBootstrap {
             if (settings.maxLevel!! > 0) {
                 event.builder().maxLevel(settings.maxLevel!!)
             } else {
-                toDisable.add(event.key())
+                disabled.add(event.key())
             }
 
             settings.weight?.let { event.builder().weight(it) }
@@ -69,12 +76,12 @@ class UeBootstrap : PluginBootstrap {
         })
 
         ctx.lifecycleManager.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT)) { event ->
-            if (toDisable.isEmpty()) return@registerEventHandler // Skip entirely if there's nothing to disable
+            if (disabled.isEmpty()) return@registerEventHandler // Skip entirely if there's nothing to disable
 
             val registrar = event.registrar()
 
             registrar.allTags.forEach { (key, enchantments) ->
-                val filtered = enchantments.filterNot { it in toDisable }
+                val filtered = enchantments.filterNot { it in disabled }
                 if (filtered.size != enchantments.size) {
                     registrar.setTag(key, filtered)
                 }

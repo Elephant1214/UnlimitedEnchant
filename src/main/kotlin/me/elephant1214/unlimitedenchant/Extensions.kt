@@ -2,6 +2,7 @@ package me.elephant1214.unlimitedenchant
 
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry
 import io.papermc.paper.registry.event.RegistryEntryAddEvent
+import me.elephant1214.unlimitedenchant.config.LevelCost
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -26,3 +27,16 @@ val ItemStack.allEnchantments: Map<Enchantment, Int>
 @Suppress("UnstableApiUsage")
 val RegistryEntryAddEvent<Enchantment, EnchantmentRegistryEntry.Builder>.adventureKey: Key
     get() = this.key().key()
+
+val Enchantment.adventureKey: Key
+    get() = this.key().key()
+
+fun Enchantment.activeMinCost() = LevelCost(
+    base = getMinModifiedCost(1),
+    perLevel = getMinModifiedCost(2) - getMinModifiedCost(1),
+)
+
+fun Enchantment.activeMaxCost() = LevelCost(
+    base = getMaxModifiedCost(1),
+    perLevel = getMaxModifiedCost(2) - getMaxModifiedCost(1),
+)

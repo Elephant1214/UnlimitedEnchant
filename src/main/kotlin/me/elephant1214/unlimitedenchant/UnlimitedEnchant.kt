@@ -2,9 +2,11 @@ package me.elephant1214.unlimitedenchant
 
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import me.elephant1214.unlimitedenchant.bootstrap.DisabledEnchantments
 import me.elephant1214.unlimitedenchant.bootstrap.VanillaValuesMap
-import me.elephant1214.unlimitedenchant.commands.levelSet
+import me.elephant1214.unlimitedenchant.commands.get
 import me.elephant1214.unlimitedenchant.commands.reload
+import me.elephant1214.unlimitedenchant.commands.set
 import me.elephant1214.unlimitedenchant.config.ConfigHolder
 import me.elephant1214.unlimitedenchant.config.ConfigLoader
 import me.elephant1214.unlimitedenchant.config.UeConfig
@@ -18,6 +20,7 @@ class UnlimitedEnchant(
     private val configLoader: ConfigLoader,
     override var config: UeConfig,
     val vanillaValues: VanillaValuesMap,
+    val disabled: DisabledEnchantments,
 ) : JavaPlugin(), ConfigHolder {
 
     override fun onEnable() {
@@ -37,7 +40,8 @@ class UnlimitedEnchant(
                 requires { it.sender.hasPermission(UePermission.ADMIN) }
 
                 reload(this@UnlimitedEnchant)
-                levelSet(this@UnlimitedEnchant)
+                set(this@UnlimitedEnchant)
+                get(this@UnlimitedEnchant)
             }
 
             commands.registrar().register(
